@@ -15,11 +15,9 @@
   $: staticOwnedFields = fields.filter((field) => field.farmerId === farmerId);
   $: storedOwnedFields = $userFields.filter((field) => field.farmerId === farmerId);
   $: myFields = [...staticOwnedFields, ...storedOwnedFields];
-  $: primary = myFields.find((field) => field.id === selectedFieldId) ?? myFields[0];
-
-  $: if (primary && selectedFieldId !== primary.id) {
-    selectedFieldId = primary.id;
-  }
+  $: primary = selectedFieldId
+    ? (myFields.find((field) => field.id === selectedFieldId) ?? myFields[0])
+    : myFields[0];
 
   function removeField(fieldId: string) {
     if (!$session || $session.role !== 'farmer') return;
