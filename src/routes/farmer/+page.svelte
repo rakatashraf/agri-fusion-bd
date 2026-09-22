@@ -1,55 +1,59 @@
 <script lang="ts">
-  import { farmerKpis, recommendations, weatherAlerts, field } from '$lib/data';
-  let language = 'bn';
+  import LiveGpsMap from '$lib/components/LiveGpsMap.svelte';
+  import { fields, farmers, rotationPlans, alerts } from '$lib/data';
+  import { language, session } from '$lib/stores/app';
+  import { tr, localText } from '$lib/i18n';
+
+  $: farmerId = $session?.role === 'farmer' ? $session.id : 'farmer-001';
+  $: farmer = farmers.find((item) => item.id === farmerId) ?? farmers[0];
+  $: myFields = fields.filter((field) => farmer.fieldIds.includes(field.id));
+  $: primary = myFields[0] ?? fields[0];
 </script>
-<svelte:head><title>Farmer Dashboard | AgriFusion BD</title></svelte:head>
-<header class="topbar">
-  <a href="/" class="brand"><span class="brand-mark">🌾</span><span>AgriFusion BD</span></a>
-  <nav class="nav"><a href="/farmer">আজকের পরামর্শ</a><a href="/field">আমার জমি</a><a href="/map">নতুন জমি</a><a href="/specialist">বিশেষজ্ঞ ভিউ</a></nav>
-  <select class="lang" bind:value={language}><option value="bn">বাংলা</option><option value="en">English</option></select>
-</header>
-<main class="shell">
-  <section class="hero" style="padding:28px 30px">
-    <div class="eyebrow">{field.name} • {field.areaHa} ha • {field.crop}</div>
-    <h1 style="font-size:clamp(2rem,4vw,3.2rem)">আজকের কাজ ৩টি। অপ্রয়োজনীয় সেচ এখনই বন্ধ রাখুন।</h1>
-    <p>সর্বশেষ স্যাটেলাইট, রোভার এবং আবহাওয়া তথ্য একত্র করে সাজানো হয়েছে। আপডেট: {field.updated}</p>
-    <div class="actions"><a class="btn btn-primary" href="#actions">আজকের কাজ দেখুন</a><a class="btn btn-secondary" href="/field">জমির স্বাস্থ্য দেখুন</a></div>
+
+<svelte:head><title>{tr($language,'farmerHome')} | AgriFusion BD</title></svelte:head>
+
+<main class="page">
+  <section class="page-title">
+    <div><span class="eyebrow">{localText(primary.name,$language)} • {primary.areaHa} ha</span><h1>{tr($language,'farmerHome')}</h1><p>{localText(primary.crop,$language)} • {tr($language,'updated')}: {primary.updated}</p></div>
+    <div class="health-pill"><span>{tr($language,'fieldHealth')}</span><strong>{primary.health}/100</strong></div>
   </section>
 
-  <div class="alert-strip"><span>⚠️</span><div><strong>বৃহস্পতি–শুক্রবার ভারী বৃষ্টির সম্ভাবনা।</strong><div class="small">আগে থেকেই ড্রেন পরিষ্কার করুন। বৃষ্টির 24 ঘণ্টা আগে ইউরিয়া বা কীটনাশক প্রয়োগ এড়িয়ে চলুন।</div></div></div>
-
-  <div class="section-title"><h2>এক নজরে</h2><span class="badge">ডেটা মান: ভালো • 87%</span></div>
-  <section class="grid grid-4">
-    {#each farmerKpis as item}
-      <div class="card {item.tone === 'urgent' ? 'danger' : item.tone === 'watch' ? 'priority' : 'good'}">
-        <div class="muted small">{item.label}</div><div class="metric">{item.value}</div><div class="small">{item.note}</div>
-      </div>
-    {/each}
+  <section class="action-card">
+    <div class="action-number">1</div>
+    <div>
+      <span class="eyebrow">{tr($language,'today')}</span>
+      <h2>{localText(primary.action,$language)}</h2>
+      <p>{tr($language,'why')}: {$language === 'bn' ? 'স্যাটেলাইট NDVI, রোভার মাটির আর্দ্রতা এবং পরবর্তী 48 ঘণ্টার বৃষ্টির পূর্বাভাস একসাথে বিবেচনা করা হয়েছে।' : 'Satellite vegetation signal, rover soil moisture and the next 48-hour rainfall outlook were considered together.'}</p>
+    </div>
   </section>
 
-  <div class="section-title" id="actions"><h2>আজ কী করবেন</h2><span class="muted small">কারণ + সাশ্রয় + পরবর্তী পদক্ষেপ</span></div>
-  <section class="grid grid-3">
-    {#each recommendations as rec}
-      <article class="card {rec.severity === 'urgent' ? 'danger' : rec.severity === 'watch' ? 'priority' : 'good'}">
-        <div class="kpi"><span class="badge {rec.severity === 'watch' ? 'badge-warn' : ''}">Priority {rec.priority}</span><span>✓</span></div>
-        <h3 style="margin-top:12px">{rec.title}</h3>
-        <p class="muted">{rec.why}</p>
-        <p><strong>সাশ্রয়/লাভ:</strong> {rec.saving}</p>
-        <div class="small"><strong>এখন করুন:</strong> {rec.action}</div>
-      </article>
-    {/each}
+  <section class="metric-grid">
+    <article><span>{tr($language,'soilMoisture')}</span><strong>{primary.soilMoisture}%</strong><small>{tr($language,'roverLayer')}</small></article>
+    <article><span>NDVI</span><strong>{primary.ndvi}</strong><small>{tr($language,'nasaLayer')}</small></article>
+    <article><span>{tr($language,'savings')}</span><strong>৳{primary.savingBdt}</strong><small>{$language === 'bn' ? 'এই সপ্তাহে সম্ভাব্য' : 'Potential this week'}</small></article>
+    <article><span>{tr($language,'waterSaved')}</span><strong>{primary.waterSavedL} L</strong><small>{$language === 'bn' ? 'অপ্রয়োজনীয় সেচ এড়ালে' : 'By avoiding unnecessary irrigation'}</small></article>
   </section>
 
-  <div class="section-title"><h2>৪ দিনের প্রস্তুতি</h2><span class="muted small">Forecast-aware farm plan</span></div>
-  <section class="card table-wrap">
-    <table><thead><tr><th>দিন</th><th>বৃষ্টি</th><th>ঝুঁকি</th><th>করণীয়</th></tr></thead><tbody>
-      {#each weatherAlerts as row}<tr><td><strong>{row.day}</strong></td><td>{row.rain}</td><td><span class="badge {row.risk === 'উচ্চ' ? 'badge-danger' : row.risk === 'মাঝারি' ? 'badge-warn' : ''}">{row.risk}</span></td><td>{row.note}</td></tr>{/each}
-    </tbody></table>
+  <section class="content-section">
+    <div class="section-heading"><div><span class="eyebrow">GPS + field boundary</span><h2>{tr($language,'map')}</h2></div><a href="/map">{tr($language,'allFields')} →</a></div>
+    <LiveGpsMap fields={myFields} height="330px" />
   </section>
 
-  <div class="section-title"><h2>মিশ্র/আন্তঃফসলের সুযোগ</h2></div>
-  <section class="grid grid-2">
-    <div class="card"><div class="recommendation"><div class="rec-icon">🌱</div><div><h3>ধানের আইলে মুগ</h3><p class="muted">বর্তমান আলো ও খালি আইলের ভিত্তিতে পরীক্ষামূলকভাবে ছোট অংশে বিবেচনা করা যায়। মূল ফসলের পানি ব্যবস্থাপনা যেন ক্ষতিগ্রস্ত না হয়।</p><span class="badge">Potential extra income</span></div></div></div>
-    <div class="card"><div class="recommendation"><div class="rec-icon">♻️</div><div><h3>ধৈঞ্চা / green manure strip</h3><p class="muted">মাটির জৈব পদার্থ ও নাইট্রোজেন ব্যবস্থাপনায় সহায়ক হতে পারে। স্থানীয় জাত, মৌসুম ও কৃষি কর্মকর্তার পরামর্শের সাথে মিলিয়ে নিন।</p><span class="badge">Soil improvement</span></div></div></div>
+  <section class="content-section">
+    <div class="section-heading"><div><span class="eyebrow">{tr($language,'currentSeason')}</span><h2>{tr($language,'rotation')}</h2><p>{tr($language,'rotationIntro')}</p></div></div>
+    <div class="rotation-list">
+      {#each rotationPlans as plan, index}
+        <article class:recommended={index === 0}>
+          <div class="rotation-rank">{index + 1}</div>
+          <div class="rotation-main"><strong>{localText(plan.sequence,$language)}</strong><p>{localText(plan.reason,$language)}</p><div class="tag-row"><span>{tr($language,'waterSaved')} {plan.water}</span><span>{$language === 'bn' ? 'সার' : 'Fertilizer'} {plan.fertilizer}</span></div></div>
+          <div class="fit-score"><strong>{plan.fit}</strong><small>{$language === 'bn' ? 'উপযোগিতা' : 'fit score'}</small></div>
+        </article>
+      {/each}
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="section-heading"><div><h2>{tr($language,'alerts')}</h2></div></div>
+    <div class="alert-list">{#each alerts as alert}<article class="alert-item {alert.severity}"><span>!</span><div><strong>{localText(alert.title,$language)}</strong><p>{localText(alert.detail,$language)}</p></div></article>{/each}</div>
   </section>
 </main>

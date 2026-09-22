@@ -1,38 +1,55 @@
 # AgriFusion BD
 
-A redesigned derivative of `baseplate-admin/nasa-space-apps-web`, focused on Bangladeshi farmers first and agriculture specialists second.
+A farmer-first decision-support web app for the NASA Space Apps Challenge 2026 **Field Shift: Adapting Farms with NASA Data** challenge.
 
-## Deploy
+The product combines NASA Earth-observation context with local ground observations from a GPS rover, crop characteristics, farmer priorities and weather context to turn complex data into practical field decisions.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Frakatashraf%2Fagri-fusion-bd&project-name=agri-fusion-bd&repository-name=agri-fusion-bd)
+## Main experiences
 
-The repository includes `vercel.json` and is configured for SvelteKit deployment on Vercel.
+### Farmer
+- Bangla/English interface with persistent language preference.
+- Account-based personal dashboard.
+- Clear “what should I do today?” decision card.
+- Live GPS map with field boundaries and health/risk colors.
+- Soil moisture, NDVI, savings and water-use summaries.
+- Crop-rotation planner focused on soil health, water demand and resilience.
+- Early-warning cards for weather and field risk.
 
-## Product structure
-
-- `/farmer` - Bangla-first action dashboard: what to do today, why, likely cost/water impact, weather preparation, targeted pest scouting and intercropping ideas.
-- `/specialist` - zone-level diagnostic workspace: satellite/rover/fused measurements, evidence, trends, intervention priorities and rover mission summary.
-- `/field` - unified field report shared between farmer and specialist workflows.
-- `/map` - GPS bounding-box input and rover route planning preview.
+### Agriculture specialist
+- Select a responsible administrative/agricultural area.
+- Aggregate area summary across all registered farms.
+- Field-health/risk map for the selected area.
+- Registered-farmer directory.
+- Individual farmer and field reports.
+- Area-level savings, water and risk summaries.
 
 ## Data architecture
 
-1. **Satellite ingestion**: NDVI/vegetation, surface temperature, rainfall and other EO layers.
-2. **Rover ingestion**: GPS-tagged soil moisture, pH, EC, temperatures and crop imagery.
-3. **Weather/forecast ingestion**: rainfall, heat and disaster probabilities.
-4. **Normalization**: timestamps, units, coordinate system and quality flags.
-5. **Spatial alignment**: map rover samples to grid cells / satellite pixels.
-6. **Fusion**: confidence- and freshness-weighted estimates. `src/lib/fusion.ts` contains a simple transparent baseline.
-7. **Decision engine**: crop-stage thresholds, forecast context, input-cost rules and agronomic constraints.
-8. **Output**: explainable recommendations with source confidence, expected saving and next action.
+1. NASA Earth observations provide spatial context such as vegetation condition, rainfall and soil-moisture signals.
+2. A GPS rover collects field-level observations such as soil moisture, pH, EC, temperature and crop images.
+3. Ground and satellite observations are aligned by coordinates and timestamps.
+4. A fusion/decision layer combines confidence, crop stage, weather and farmer priorities.
+5. Outputs are simplified for farmers and expanded for specialists.
 
-## Important implementation note
+## Demo account system
 
-The current repository is a front-end prototype. The values in `src/lib/data.ts` are realistic demo values to make the redesigned UX testable. They must be replaced by backend API responses before production use. Recommendations involving pesticides, fertilizer rates or crop disease should be validated against local agronomy rules and Bangladesh agricultural guidance before being presented as prescriptive instructions.
+This hackathon build includes a **client-side demo account system** with persistent browser sessions so the role-based UX can be tested without external credentials.
 
-## Run
+Demo accounts:
+- Farmer: `01700000001` / `1234`
+- Specialist: `specialist@demo.bd` / `1234`
+
+For production, replace demo authentication/localStorage with a secure backend identity provider and database (for example Firebase Auth + Firestore, Supabase Auth + Postgres, or an equivalent managed service). Passwords must never be stored client-side in production.
+
+## Maps
+
+The live GPS map uses browser geolocation and OpenStreetMap tiles through Leaflet. Field polygons show risk levels. Users must grant location permission for live GPS tracking.
+
+## Vercel
+
+The project uses `@sveltejs/adapter-vercel` with Node.js 24.
 
 ```bash
 npm install
-npm run dev
+npm run build
 ```
