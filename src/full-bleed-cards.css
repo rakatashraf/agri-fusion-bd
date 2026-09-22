@@ -1,0 +1,709 @@
+/* Full-bleed photographic card system. Loaded last. */
+
+:root {
+  --card-overlay-dark: linear-gradient(180deg, rgba(12,24,16,.08) 0%, rgba(12,24,16,.34) 42%, rgba(12,24,16,.86) 100%);
+  --card-overlay-soft: linear-gradient(180deg, rgba(12,24,16,.16) 0%, rgba(12,24,16,.48) 52%, rgba(12,24,16,.88) 100%);
+  --card-overlay-left: linear-gradient(90deg, rgba(12,24,16,.9) 0%, rgba(12,24,16,.66) 56%, rgba(12,24,16,.3) 100%);
+}
+
+/* Shared mechanics */
+.field-select-card,
+.simple-status,
+.metric-grid article,
+.metric-grid > div,
+.specialist-metrics article,
+.rotation-list article,
+.entry-choice,
+.ag-solution,
+.farmer-row,
+.summary-panel > div,
+.map-field-photo-card,
+.photo-profile-card,
+.photo-info-list > div,
+.photo-role-choice,
+.photo-demo-box,
+.photo-field-report,
+.photo-page-title,
+.photo-empty-state {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden !important;
+  background: #253a2d !important;
+  color: white !important;
+  border-color: rgba(255,255,255,.15) !important;
+  box-shadow: 0 18px 42px rgba(18,38,25,.11);
+}
+
+/* Every existing relevant image becomes the entire card background. */
+.field-select-card > .field-card-photo,
+.simple-status > .simple-status-photo,
+.metric-grid article > .metric-card-photo,
+.metric-grid > div > .metric-card-photo,
+.specialist-metrics article > .metric-card-photo,
+.rotation-list article > .rotation-photo,
+.entry-choice > .entry-photo,
+.ag-solution > .solution-photo,
+.farmer-row > .farmer-thumb,
+.summary-panel > div > .summary-card-photo,
+.map-field-photo-card > .map-field-photo,
+.photo-profile-card > img:first-child,
+.photo-info-list > div > img:first-child,
+.photo-role-choice > img:first-child,
+.photo-demo-box > img:first-child,
+.photo-field-report > .field-report-photo,
+.photo-page-title > img:first-child,
+.photo-empty-state > img:first-child {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  z-index: 0 !important;
+  filter: saturate(.94) contrast(1.02);
+}
+
+/* Universal readable overlay. */
+.field-select-card::after,
+.simple-status::after,
+.metric-grid article::after,
+.metric-grid > div::after,
+.specialist-metrics article::after,
+.rotation-list article::after,
+.entry-choice::after,
+.ag-solution:not(.primary)::after,
+.farmer-row::after,
+.summary-panel > div::after,
+.map-field-photo-card::after,
+.photo-profile-card::after,
+.photo-info-list > div::after,
+.photo-role-choice::after,
+.photo-demo-box::after,
+.photo-field-report::after,
+.photo-page-title::after,
+.photo-empty-state::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: var(--card-overlay-dark);
+}
+
+/* Bring actual UI content above photo and overlay. */
+.field-select-card > *:not(.field-card-photo),
+.simple-status > *:not(.simple-status-photo),
+.metric-grid article > *:not(.metric-card-photo),
+.metric-grid > div > *:not(.metric-card-photo),
+.specialist-metrics article > *:not(.metric-card-photo),
+.rotation-list article > *:not(.rotation-photo),
+.entry-choice > *:not(.entry-photo),
+.ag-solution > *:not(.solution-photo),
+.farmer-row > *:not(.farmer-thumb),
+.summary-panel > div > *:not(.summary-card-photo),
+.map-field-photo-card > *:not(.map-field-photo),
+.photo-profile-card > *:not(img:first-child),
+.photo-info-list > div > *:not(img:first-child),
+.photo-role-choice > *:not(img:first-child),
+.photo-demo-box > *:not(img:first-child),
+.photo-field-report > *:not(.field-report-photo),
+.photo-page-title > *:not(img:first-child),
+.photo-empty-state > *:not(img:first-child) {
+  position: relative;
+  z-index: 2;
+}
+
+/* White-on-image typography */
+.field-select-card,
+.field-select-card span,
+.field-select-card strong,
+.simple-status,
+.simple-status span,
+.simple-status strong,
+.metric-grid article,
+.metric-grid article span,
+.metric-grid article strong,
+.metric-grid article small,
+.metric-grid > div,
+.metric-grid > div span,
+.metric-grid > div strong,
+.metric-grid > div small,
+.rotation-list article,
+.rotation-list article p,
+.rotation-list article strong,
+.rotation-list article small,
+.entry-choice,
+.entry-choice span,
+.entry-choice strong,
+.ag-solution:not(.primary),
+.ag-solution:not(.primary) p,
+.ag-solution:not(.primary) h3,
+.farmer-row,
+.farmer-row span,
+.farmer-row strong,
+.summary-panel > div,
+.summary-panel > div span,
+.summary-panel > div strong,
+.map-field-photo-card,
+.map-field-photo-card small,
+.map-field-photo-card strong,
+.photo-profile-card,
+.photo-profile-card p,
+.photo-profile-card h1,
+.photo-info-list > div,
+.photo-info-list > div span,
+.photo-info-list > div strong,
+.photo-role-choice,
+.photo-demo-box,
+.photo-demo-box strong,
+.photo-field-report,
+.photo-field-report p,
+.photo-field-report h2,
+.photo-page-title,
+.photo-page-title p,
+.photo-page-title h1,
+.photo-empty-state,
+.photo-empty-state p,
+.photo-empty-state h1,
+.photo-empty-state h2 {
+  color: white !important;
+}
+
+/* Field cards */
+.field-select-card {
+  min-height: 220px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: flex-end !important;
+}
+
+.field-card-content {
+  width: 100%;
+  min-height: 100%;
+  padding: 88px 17px 17px !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 7px;
+  background: transparent !important;
+}
+
+.field-select-card.active {
+  outline: 3px solid #d8ff66 !important;
+  outline-offset: 2px;
+  box-shadow: 0 18px 48px rgba(18,38,25,.18) !important;
+}
+
+.field-card-health {
+  border-top-color: rgba(255,255,255,.28) !important;
+}
+
+.field-index,
+.risk-badge,
+.tag-row span,
+.card-tag {
+  backdrop-filter: blur(10px);
+}
+
+/* Advice cards */
+.simple-status {
+  min-height: 250px !important;
+  padding: 140px 18px 18px !important;
+  align-content: end !important;
+}
+
+.simple-status::after {
+  background: var(--card-overlay-soft);
+}
+
+.simple-status.good::after {
+  background: linear-gradient(180deg, rgba(12,45,21,.08), rgba(16,73,31,.35) 44%, rgba(15,59,29,.9));
+}
+.simple-status.warn::after {
+  background: linear-gradient(180deg, rgba(65,40,7,.05), rgba(91,56,8,.36) 44%, rgba(75,45,7,.9));
+}
+.simple-status.danger::after {
+  background: linear-gradient(180deg, rgba(72,17,12,.05), rgba(99,28,19,.38) 44%, rgba(76,20,15,.92));
+}
+.simple-status.info::after {
+  background: linear-gradient(180deg, rgba(9,40,65,.05), rgba(13,61,91,.36) 44%, rgba(10,48,71,.9));
+}
+
+.simple-status-icon {
+  background: rgba(255,255,255,.18) !important;
+  color: white !important;
+  backdrop-filter: blur(10px);
+}
+
+.simple-status-copy span {
+  color: rgba(255,255,255,.82) !important;
+}
+
+/* Technical metrics become full photographic tiles. */
+.metric-grid article,
+.metric-grid > div,
+.specialist-metrics article {
+  min-height: 190px !important;
+  padding: 92px 18px 18px !important;
+  align-content: end !important;
+}
+
+.metric-grid article::after,
+.metric-grid > div::after,
+.specialist-metrics article::after {
+  background: var(--card-overlay-soft);
+}
+
+.metric-grid article > span,
+.metric-grid > div > span,
+.specialist-metrics article > span {
+  color: rgba(255,255,255,.78) !important;
+}
+
+.metric-grid article > small,
+.metric-grid > div > small,
+.specialist-metrics article > small {
+  color: rgba(255,255,255,.66) !important;
+}
+
+/* Rotation cards */
+.rotation-list article {
+  min-height: 220px !important;
+  padding: 112px 18px 18px !important;
+  grid-template-columns: auto minmax(0,1fr) auto !important;
+  align-items: end !important;
+}
+
+.rotation-list article::after {
+  background: var(--card-overlay-soft);
+}
+
+.rotation-list article.recommended {
+  outline: 3px solid rgba(216,255,102,.9);
+  outline-offset: -3px;
+}
+
+.rotation-list article .rotation-rank {
+  background: rgba(216,255,102,.92) !important;
+  color: #183021 !important;
+}
+
+.rotation-list article p {
+  color: rgba(255,255,255,.8) !important;
+}
+
+/* Home role cards */
+.entry-choice {
+  min-height: 250px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+}
+
+.entry-choice::after {
+  background: var(--card-overlay-soft);
+}
+
+.entry-choice-body {
+  width: 100%;
+  padding: 122px 20px 20px !important;
+  place-items: start !important;
+  text-align: left !important;
+}
+
+.entry-choice-body span {
+  color: rgba(255,255,255,.8) !important;
+}
+
+/* Home solution cards */
+.ag-solution:not(.primary) {
+  min-height: 320px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+}
+
+.ag-solution:not(.primary)::after {
+  background: var(--card-overlay-soft);
+}
+
+.ag-solution:not(.primary) > div:not(.solution-number) {
+  padding: 130px 22px 24px !important;
+  width: 100%;
+}
+
+.ag-solution .solution-icon {
+  background: rgba(255,255,255,.2) !important;
+  color: white !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Specialist farmer rows become visual cards, not spreadsheet rows. */
+.farmer-list {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 12px;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+.farmer-row {
+  min-height: 190px;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start !important;
+  justify-content: flex-end;
+  padding: 18px !important;
+  border: 0 !important;
+  border-radius: 20px;
+}
+
+.farmer-row::after {
+  background: var(--card-overlay-soft);
+}
+
+.farmer-health {
+  display: flex !important;
+  gap: 5px;
+  align-items: baseline;
+  text-align: left !important;
+}
+
+.row-arrow {
+  position: absolute !important;
+  top: 15px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,.17);
+  color: white !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Specialist summary cards */
+.summary-panel {
+  gap: 12px !important;
+  background: transparent !important;
+  border: 0 !important;
+  overflow: visible !important;
+}
+
+.summary-panel > div {
+  min-height: 210px;
+  justify-content: flex-end;
+  padding: 118px 20px 20px !important;
+  border: 0 !important;
+  border-radius: 20px;
+}
+
+.summary-panel > div::after {
+  background: var(--card-overlay-soft);
+}
+
+/* Map field list */
+.map-field-photo-card {
+  min-height: 180px !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start !important;
+  padding: 18px !important;
+  border: 0 !important;
+}
+
+.map-field-photo-card::after {
+  background: var(--card-overlay-soft);
+}
+
+.map-field-photo-card .status-dot {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  width: 13px;
+  height: 13px;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.9);
+}
+
+.map-field-photo-card .mini-health {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  background: rgba(255,255,255,.18) !important;
+  color: white !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Account/profile cards */
+.photo-profile-card {
+  min-height: 260px;
+  display: flex !important;
+  align-items: flex-end !important;
+  padding: 22px !important;
+}
+
+.photo-profile-card::after {
+  background: var(--card-overlay-left);
+}
+
+.photo-profile-card .profile-avatar {
+  background: rgba(216,255,102,.92) !important;
+  color: #183021 !important;
+}
+
+.photo-info-list {
+  display: grid !important;
+  gap: 10px;
+  background: transparent !important;
+  border: 0 !important;
+  overflow: visible !important;
+}
+
+.photo-info-list > div {
+  min-height: 150px;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start !important;
+  padding: 18px !important;
+  border: 0 !important;
+  border-radius: 18px;
+}
+
+.photo-info-list > div::after {
+  background: var(--card-overlay-soft);
+}
+
+/* Login role/demo cards */
+.photo-role-choice {
+  min-height: 170px;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px !important;
+  border-radius: 18px;
+}
+
+.photo-role-choice::after {
+  background: var(--card-overlay-soft);
+}
+
+.photo-role-choice.active {
+  outline: 3px solid #d8ff66;
+  outline-offset: 2px;
+}
+
+.photo-demo-box {
+  min-height: 190px;
+  padding: 88px 16px 16px !important;
+  border-radius: 18px;
+}
+
+.photo-demo-box::after {
+  background: var(--card-overlay-soft);
+}
+
+.photo-demo-box .button.secondary {
+  background: rgba(255,255,255,.16) !important;
+  color: white !important;
+  border-color: rgba(255,255,255,.35) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Individual field reports */
+.photo-field-report {
+  min-height: 360px;
+}
+
+.photo-field-report::after {
+  background: var(--card-overlay-soft);
+}
+
+.field-report-body {
+  padding: 150px 20px 20px !important;
+}
+
+.photo-field-report .decision-box {
+  background: rgba(255,255,255,.14) !important;
+  color: white !important;
+  backdrop-filter: blur(12px);
+}
+
+.photo-field-report .decision-box span,
+.photo-field-report .decision-box strong {
+  color: white !important;
+}
+
+/* Page-title / overview cards */
+.photo-page-title {
+  min-height: 260px;
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 18px;
+  padding: 24px !important;
+}
+
+.photo-page-title::after {
+  background: var(--card-overlay-left);
+}
+
+.photo-page-title > div:not(.health-pill) {
+  padding: 0 !important;
+}
+
+.photo-page-title .eyebrow {
+  color: #d8ff66 !important;
+}
+
+.photo-page-title .health-pill,
+.photo-page-title .area-select select {
+  background: rgba(255,255,255,.15) !important;
+  color: white !important;
+  border-color: rgba(255,255,255,.32) !important;
+  backdrop-filter: blur(12px);
+}
+
+.photo-page-title .area-select {
+  color: white !important;
+}
+
+/* Empty-state cards */
+.photo-empty-state {
+  min-height: 300px;
+  display: flex !important;
+  align-items: flex-end !important;
+  padding: 24px !important;
+}
+
+.photo-empty-state::after {
+  background: var(--card-overlay-soft);
+}
+
+.photo-empty-state > div {
+  padding: 0 !important;
+  width: min(620px, 100%);
+}
+
+/* Keep primary CTA/read-aloud surfaces readable over photos. */
+.field-select-card .risk-badge,
+.field-select-card .field-index,
+.metric-grid .tag-row span,
+.rotation-list .tag-row span {
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+/* Responsive full-bleed behavior */
+@media (max-width: 800px) {
+  .field-select-card,
+  .entry-choice,
+  .simple-status,
+  .metric-grid article,
+  .metric-grid > div,
+  .specialist-metrics article,
+  .rotation-list article,
+  .summary-panel > div,
+  .map-field-photo-card {
+    min-height: 200px !important;
+  }
+
+  .photo-page-title {
+    display: flex !important;
+    min-height: 240px;
+    padding: 20px !important;
+  }
+
+  .photo-page-title > .area-select,
+  .photo-page-title > .health-pill {
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  .rotation-list article {
+    grid-template-columns: auto minmax(0,1fr) !important;
+  }
+
+  .rotation-list article .fit-score {
+    grid-column: 2 !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .field-select-card,
+  .entry-choice,
+  .simple-status,
+  .metric-grid article,
+  .metric-grid > div,
+  .specialist-metrics article,
+  .rotation-list article,
+  .summary-panel > div,
+  .map-field-photo-card,
+  .photo-role-choice {
+    min-height: 185px !important;
+  }
+
+  .field-card-content {
+    padding-top: 78px !important;
+  }
+
+  .simple-status {
+    padding: 102px 16px 16px !important;
+  }
+
+  .metric-grid article,
+  .metric-grid > div,
+  .specialist-metrics article {
+    padding: 82px 16px 16px !important;
+  }
+
+  .rotation-list article {
+    padding: 96px 16px 16px !important;
+  }
+
+  .entry-choice {
+    display: flex !important;
+    min-height: 210px !important;
+  }
+
+  .entry-choice-body {
+    padding: 110px 17px 17px !important;
+  }
+
+  .photo-page-title {
+    min-height: 280px;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch !important;
+  }
+
+  .photo-page-title > .area-select,
+  .photo-page-title > .health-pill {
+    width: 100% !important;
+  }
+
+  .farmer-row {
+    min-height: 170px;
+  }
+
+  .photo-profile-card {
+    min-height: 240px;
+  }
+
+  .photo-info-list > div {
+    min-height: 140px;
+  }
+
+  .photo-field-report {
+    min-height: 330px;
+  }
+
+  .field-report-body {
+    padding: 126px 16px 16px !important;
+  }
+}
