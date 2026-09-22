@@ -1,12 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import VoiceGuide from '$lib/components/VoiceGuide.svelte';
   import { areas } from '$lib/data';
   import { language, session } from '$lib/stores/app';
-  import { tr, localText } from '$lib/i18n';
+  import { localText } from '$lib/i18n';
   import { createFarmerField } from '$lib/fields';
   import { appPath } from '$lib/nav';
 
+  let step = 1;
   let fieldName = '';
   let crop = '';
   let nextCrop = '';
@@ -20,6 +22,30 @@
   onMount(() => {
     if ($session?.areaId) areaId = $session.areaId;
   });
+
+  $: stepVoice = step === 1
+    ? ($language === 'bn' ? 'প্রথম ধাপ। জমির নাম এবং এখন কী ফসল আছে তা লিখুন।' : 'Step one. Enter the field name and current crop.')
+    : step === 2
+      ? ($language === 'bn' ? 'দ্বিতীয় ধাপ। জমির আয়তন এবং এলাকা নির্বাচন করুন।' : 'Step two. Enter the field size and select the area.')
+      : ($language === 'bn' ? 'তৃতীয় ধাপ। GPS দিয়ে জমির অবস্থান নিন। তারপর জমি সংরক্ষণ করুন।' : 'Step three. Capture the field location with GPS, then save the field.');
+
+  function next() {
+    error = '';
+    if (step === 1 && (!fieldName.trim() || !crop.trim())) {
+      error = $language === 'bn' ? 'জমির নাম এবং ফসল লিখুন।' : 'Enter the field name and crop.';
+      return;
+    }
+    if (step === 2 && (!areaHa || areaHa <= 0)) {
+      error = $language === 'bn' ? 'জমির আয়তন দিন।' : 'Enter the field size.';
+      return;
+    }
+    step = Math.min(3, step + 1);
+  }
+
+  function back() {
+    error = '';
+    step = Math.max(1, step - 1);
+  }
 
   function useGps() {
     if (!navigator.geolocation) {
@@ -45,7 +71,7 @@
       return;
     }
     if (!fieldName.trim() || !crop.trim() || !areaHa || areaHa <= 0 || !Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-      error = $language === 'bn' ? 'জমির নাম, ফসল, আয়তন এবং অবস্থান সঠিকভাবে দিন।' : 'Please provide a valid field name, crop, area and location.';
+      error = $language === 'bn' ? 'সব তথ্য আবার দেখুন।' : 'Please check the field information.';
       return;
     }
 
@@ -64,83 +90,114 @@
   }
 </script>
 
-<svelte:head><title>{$language === 'bn' ? 'নতুন জমি যোগ করুন' : 'Add crop field'} | AgriFusion BD</title></svelte:head>
+<svelte:head><title>{$language === 'bn' ? 'জমি যোগ করুন' : 'Add field'} | AgriFusion BD</title></svelte:head>
 
 <main class="page narrow">
-  <a class="back-link" href={appPath('/farmer')}>← {tr($language,'back')}</a>
+  <a class="back-link" href={appPath('/farmer')}>← {$language === 'bn' ? 'আমার জমি' : 'My farm'}</a>
 
-  <section class="auth-card add-field-card">
-    <span class="eyebrow">{$language === 'bn' ? 'আমার জমি' : 'My fields'}</span>
-    <h1>{$language === 'bn' ? 'নতুন ফসলের জমি যোগ করুন' : 'Add a crop field'}</h1>
-    <p>{$language === 'bn'
-      ? 'প্রতিটি জমি আলাদাভাবে যোগ করুন। পরে প্রতিটি জমির জন্য আলাদা স্যাটেলাইট, রোভার, আবহাওয়া ও পরামর্শ দেখা যাবে।'
-      : 'Register each field separately so satellite, rover, weather and recommendations can be tracked per field.'}</p>
+  <section class="wizard-shell">
+    <header class="wizard-head">
+      <span class="eyebrow">{$language === 'bn' ? 'সহজ ৩ ধাপ' : '3 simple steps'}</span>
+      <h1>{$language === 'bn' ? 'নতুন জমি যোগ করুন' : 'Add a new field'}</h1>
+      <VoiceGuide text={stepVoice} />
 
-    {#if !$session || $session.role !== 'farmer'}
-      <div class="form-error">{$language === 'bn' ? 'জমি যোগ করতে কৃষক অ্যাকাউন্টে লগইন করুন।' : 'Sign in with a farmer account to add fields.'}</div>
-      <a class="button primary full" href={appPath('/login')}>{tr($language,'login')}</a>
-    {:else}
-      <form class="form-stack" on:submit|preventDefault={saveField}>
-        <label>
-          {$language === 'bn' ? 'জমির নাম' : 'Field name'}
-          <input bind:value={fieldName} placeholder={$language === 'bn' ? 'যেমন: উত্তর মাঠ' : 'e.g. North Field'} />
-        </label>
+      <div class="wizard-steps" aria-label="Progress">
+        <div class="wizard-step" class:active={step===1} class:done={step>1}><span class="step-icon">🌾</span><strong>{$language === 'bn' ? 'ফসল' : 'Crop'}</strong></div>
+        <div class="wizard-step" class:active={step===2} class:done={step>2}><span class="step-icon">📏</span><strong>{$language === 'bn' ? 'আয়তন' : 'Size'}</strong></div>
+        <div class="wizard-step" class:active={step===3}><span class="step-icon">📍</span><strong>GPS</strong></div>
+      </div>
+    </header>
 
-        <div class="form-grid-2">
+    <div class="wizard-body">
+      {#if !$session || $session.role !== 'farmer'}
+        <div class="wizard-picture">👨‍🌾</div>
+        <h2>{$language === 'bn' ? 'কৃষক অ্যাকাউন্টে লগইন করুন' : 'Sign in as a farmer'}</h2>
+        <a class="button primary full" href={appPath('/login')}>{$language === 'bn' ? 'লগইন' : 'Login'}</a>
+      {:else if step === 1}
+        <div class="wizard-picture">🌾</div>
+        <h2>{$language === 'bn' ? 'এই জমিতে কী আছে?' : 'What is growing here?'}</h2>
+        <p>{$language === 'bn' ? 'জমিকে চেনার জন্য একটি সহজ নাম দিন।' : 'Give the field a simple name you recognize.'}</p>
+
+        <div class="form-stack">
           <label>
-            {$language === 'bn' ? 'বর্তমান ফসল' : 'Current crop'}
-            <input bind:value={crop} placeholder={$language === 'bn' ? 'যেমন: আমন ধান' : 'e.g. Aman rice'} />
+            {$language === 'bn' ? '🏷️ জমির নাম' : '🏷️ Field name'}
+            <input bind:value={fieldName} placeholder={$language === 'bn' ? 'যেমন: বাড়ির পাশের জমি' : 'e.g. Field near home'} />
           </label>
           <label>
-            {$language === 'bn' ? 'পরবর্তী ফসল (ঐচ্ছিক)' : 'Next crop (optional)'}
+            {$language === 'bn' ? '🌱 এখন কী ফসল?' : '🌱 Current crop'}
+            <input bind:value={crop} placeholder={$language === 'bn' ? 'যেমন: ধান' : 'e.g. Rice'} />
+          </label>
+          <label>
+            {$language === 'bn' ? '🔄 পরের ফসল (না জানলে খালি রাখুন)' : '🔄 Next crop (optional)'}
             <input bind:value={nextCrop} placeholder={$language === 'bn' ? 'যেমন: মুগ' : 'e.g. Mung bean'} />
           </label>
         </div>
 
-        <div class="form-grid-2">
+      {:else if step === 2}
+        <div class="wizard-picture">📏</div>
+        <h2>{$language === 'bn' ? 'জমি কত বড়?' : 'How big is the field?'}</h2>
+        <p>{$language === 'bn' ? 'আনুমানিক হলেও চলবে। পরে ঠিক করা যাবে।' : 'An estimate is okay for now.'}</p>
+
+        <div class="form-stack">
           <label>
-            {$language === 'bn' ? 'জমির আয়তন (হেক্টর)' : 'Field area (hectares)'}
+            {$language === 'bn' ? '📐 আয়তন (হেক্টর)' : '📐 Area (hectares)'}
             <input type="number" min="0.01" step="0.01" bind:value={areaHa} />
           </label>
           <label>
-            {tr($language,'area')}
+            {$language === 'bn' ? '🗺️ কোন এলাকা?' : '🗺️ Which area?'}
             <select bind:value={areaId}>
               {#each areas as area}<option value={area.id}>{localText(area.name,$language)}</option>{/each}
             </select>
           </label>
         </div>
 
-        <div class="field-location-box">
-          <div class="field-location-head">
-            <div>
-              <strong>{$language === 'bn' ? 'জমির অবস্থান' : 'Field location'}</strong>
-              <small>{$language === 'bn' ? 'GPS ব্যবহার করুন অথবা latitude/longitude লিখুন।' : 'Use live GPS or enter latitude/longitude.'}</small>
-            </div>
-            <button type="button" class="button secondary small" on:click={useGps}>
-              {gpsState === 'loading'
-                ? ($language === 'bn' ? 'GPS খোঁজা হচ্ছে…' : 'Finding GPS…')
-                : ($language === 'bn' ? 'আমার GPS ব্যবহার করুন' : 'Use my GPS')}
-            </button>
-          </div>
+      {:else}
+        <div class="wizard-picture">📍</div>
+        <h2>{$language === 'bn' ? 'জমির জায়গা ধরুন' : 'Capture the field location'}</h2>
+        <p>{$language === 'bn' ? 'জমিতে দাঁড়িয়ে নিচের বড় GPS বোতাম চাপুন।' : 'Stand in the field and press the large GPS button.'}</p>
 
-          <div class="form-grid-2">
+        <button type="button" class="gps-big-button" on:click={useGps}>
+          <span class="gps-icon">{gpsState === 'loading' ? '⌛' : gpsState === 'ready' ? '✅' : '📍'}</span>
+          <span>
+            {gpsState === 'loading'
+              ? ($language === 'bn' ? 'অবস্থান খোঁজা হচ্ছে…' : 'Finding location…')
+              : gpsState === 'ready'
+                ? ($language === 'bn' ? 'GPS পাওয়া গেছে' : 'GPS captured')
+                : ($language === 'bn' ? 'আমার GPS নিন' : 'Use my GPS')}
+          </span>
+        </button>
+
+        {#if gpsState === 'error'}
+          <p class="form-error">{$language === 'bn' ? 'GPS পাওয়া যায়নি। নিচে অবস্থান লিখতে পারেন।' : 'GPS was unavailable. You can enter coordinates below.'}</p>
+        {/if}
+
+        <details class="tech-details">
+          <summary>{$language === 'bn' ? 'GPS সংখ্যা দেখতে বা বদলাতে' : 'View or edit GPS numbers'}</summary>
+          <div class="form-grid-2" style="padding:16px">
             <label>Latitude<input type="number" step="0.000001" bind:value={latitude} /></label>
             <label>Longitude<input type="number" step="0.000001" bind:value={longitude} /></label>
           </div>
+        </details>
 
-          {#if gpsState === 'ready'}<small class="success-text">{$language === 'bn' ? 'লাইভ GPS অবস্থান নেয়া হয়েছে।' : 'Live GPS location captured.'}</small>{/if}
-          {#if gpsState === 'error'}<small class="form-error">{$language === 'bn' ? 'GPS পাওয়া যায়নি। অবস্থান ম্যানুয়ালি দিন।' : 'GPS unavailable. Enter the location manually.'}</small>{/if}
+        <div class="review-list">
+          <div class="review-row"><span>🏷️</span><div><small>{$language === 'bn' ? 'জমি' : 'Field'}</small><strong>{fieldName}</strong></div></div>
+          <div class="review-row"><span>🌾</span><div><small>{$language === 'bn' ? 'ফসল' : 'Crop'}</small><strong>{crop}</strong></div></div>
+          <div class="review-row"><span>📏</span><div><small>{$language === 'bn' ? 'আয়তন' : 'Size'}</small><strong>{areaHa} ha</strong></div></div>
         </div>
+      {/if}
 
-        <div class="field-note">
-          {$language === 'bn'
-            ? 'এই ডেমোতে জমির আয়তন ও কেন্দ্রের GPS থেকে একটি আনুমানিক বর্গাকার সীমানা তৈরি হবে। পরে সরাসরি ম্যাপে হাঁটিয়ে/পয়েন্ট দিয়ে সঠিক polygon boundary নেয়া যাবে।'
-            : 'For this demo, an approximate square boundary is created from the field area and GPS center. Precise polygon drawing/walk-the-boundary capture can be added next.'}
+      {#if error}<p class="form-error">{error}</p>{/if}
+
+      {#if $session?.role === 'farmer'}
+        <div class="wizard-actions">
+          {#if step > 1}<button type="button" class="button secondary" on:click={back}>← {$language === 'bn' ? 'পেছনে' : 'Back'}</button>{:else}<span></span>{/if}
+          {#if step < 3}
+            <button type="button" class="button primary" on:click={next}>{$language === 'bn' ? 'পরের ধাপ' : 'Next'} →</button>
+          {:else}
+            <button type="button" class="button primary" on:click={saveField}>✅ {$language === 'bn' ? 'জমি সংরক্ষণ' : 'Save field'}</button>
+          {/if}
         </div>
-
-        {#if error}<p class="form-error">{error}</p>{/if}
-        <button class="button primary full" type="submit">{$language === 'bn' ? '+ জমি সংরক্ষণ করুন' : '+ Save field'}</button>
-      </form>
-    {/if}
+      {/if}
+    </div>
   </section>
 </main>

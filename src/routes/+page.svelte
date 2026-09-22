@@ -1,9 +1,13 @@
 <script lang="ts">
+  import VoiceGuide from '$lib/components/VoiceGuide.svelte';
   import { language, session } from '$lib/stores/app';
   import { tr } from '$lib/i18n';
   import { appPath } from '$lib/nav';
 
   $: dashboardHref = appPath($session?.role === 'specialist' ? '/specialist' : '/farmer');
+  $: introVoice = $language === 'bn'
+    ? 'এগ্রিফিউশন বাংলাদেশ। কৃষক হলে কৃষক ছবিতে চাপুন। কৃষি বিশেষজ্ঞ হলে বিশেষজ্ঞ ছবিতে চাপুন। জমি দেখতে ম্যাপ ছবিতে চাপুন।'
+    : 'AgriFusion Bangladesh. Tap the farmer card if you are a farmer, the specialist card if you are an agriculture specialist, or the map card to view fields.';
 </script>
 
 <svelte:head>
@@ -15,82 +19,72 @@
   <section class="ag-hero">
     <div class="ag-hero-copy">
       <span class="eyebrow">NASA EARTH DATA × LOCAL FARM INTELLIGENCE</span>
-      <h1>{$language === 'bn' ? 'ভবিষ্যতের জন্য আরও বুদ্ধিমান কৃষি।' : 'Smart farming for future generations.'}</h1>
+      <h1>{$language === 'bn' ? 'কৃষি হোক সহজ। সিদ্ধান্ত হোক পরিষ্কার।' : 'Farming made simple. Decisions made clear.'}</h1>
       <p>{$language === 'bn'
-        ? 'স্যাটেলাইট, রোভার, আবহাওয়া এবং কৃষকের নিজস্ব জমির তথ্য একত্র করে সেচ, ফসল নির্বাচন, রোগ-পোকা ও ঝুঁকির সিদ্ধান্ত সহজ করে।'
-        : 'Satellite, rover, weather and field-level data come together to simplify irrigation, crop choice, pest scouting and climate-risk decisions.'}</p>
+        ? 'জমি, পানি, আবহাওয়া আর ফসলের তথ্যকে সহজ ছবিতে ও কথায় বুঝুন।'
+        : 'Understand field, water, weather and crop information through simple visuals and clear actions.'}</p>
       <div class="ag-hero-actions">
         <a class="button primary" href={$session ? dashboardHref : appPath('/login')}>
           {$session ? tr($language,'openDashboard') : ($language === 'bn' ? 'শুরু করুন' : 'Get started')}
         </a>
-        <a class="button secondary" href={appPath('/map')}>{tr($language,'seeLiveMap')}</a>
+        <VoiceGuide text={introVoice} />
       </div>
     </div>
     <div class="ag-hero-badge">
-      <strong>NASA + Rover + GPS</strong>
-      <span>{$language === 'bn' ? 'একই সিদ্ধান্ত ব্যবস্থায়' : 'one decision system'}</span>
+      <strong>🛰️ + 🤖 + 📍</strong>
+      <span>{$language === 'bn' ? 'স্যাটেলাইট • রোভার • GPS' : 'Satellite • Rover • GPS'}</span>
     </div>
   </section>
 
-  <section class="ag-trust">
-    <div><span>{$language === 'bn' ? 'ডেটা স্তর' : 'Data layers'}</span><strong>4+</strong></div>
-    <div><span>{$language === 'bn' ? 'কৃষক মোড' : 'Farmer mode'}</span><strong>{$language === 'bn' ? 'সহজ করণীয়' : 'Action first'}</strong></div>
-    <div><span>{$language === 'bn' ? 'বিশেষজ্ঞ মোড' : 'Specialist mode'}</span><strong>{$language === 'bn' ? 'এলাকাভিত্তিক' : 'Area-wide'}</strong></div>
-    <div><span>{$language === 'bn' ? 'ম্যাপ' : 'Mapping'}</span><strong>Live GPS</strong></div>
+  <section class="low-literacy-entry">
+    <div class="entry-title">
+      <span class="eyebrow">{$language === 'bn' ? 'আপনি কী করতে চান?' : 'What do you want to do?'}</span>
+      <h2>{$language === 'bn' ? 'ছবিতে চাপুন' : 'Tap a picture'}</h2>
+      <p>{$language === 'bn' ? 'বেশি লেখা পড়তে হবে না।' : 'No need to read a lot of text.'}</p>
+    </div>
+
+    <div class="entry-choice-grid">
+      <a class="entry-choice farmer" href={$session?.role === 'farmer' ? dashboardHref : appPath('/login')}>
+        <span class="big-icon">👨‍🌾</span>
+        <strong>{$language === 'bn' ? 'আমি কৃষক' : 'I am a farmer'}</strong>
+        <span>{$language === 'bn' ? 'আজ কী করব দেখুন' : 'See what to do today'}</span>
+      </a>
+      <a class="entry-choice specialist" href={$session?.role === 'specialist' ? dashboardHref : appPath('/login')}>
+        <span class="big-icon">🧑‍🔬</span>
+        <strong>{$language === 'bn' ? 'আমি কৃষি বিশেষজ্ঞ' : 'I am a specialist'}</strong>
+        <span>{$language === 'bn' ? 'এলাকার সব জমি দেখুন' : 'See fields across an area'}</span>
+      </a>
+      <a class="entry-choice map" href={appPath('/map')}>
+        <span class="big-icon">🗺️</span>
+        <strong>{$language === 'bn' ? 'ম্যাপ দেখুন' : 'Open map'}</strong>
+        <span>{$language === 'bn' ? 'GPS ও জমির অবস্থান' : 'GPS and field locations'}</span>
+      </a>
+    </div>
   </section>
 
   <section class="ag-editorial">
+    <div><span class="ag-kicker">{$language === 'bn' ? 'কীভাবে কাজ করে' : 'How it works'}</span></div>
     <div>
-      <span class="ag-kicker">{$language === 'bn' ? 'AgriFusion কী করে' : 'What AgriFusion does'}</span>
-    </div>
-    <div>
-      <h2>{$language === 'bn' ? 'জটিল কৃষি ডেটাকে বাস্তব মাঠের সিদ্ধান্তে রূপান্তর করে।' : 'Turns complex farm data into clear field decisions.'}</h2>
+      <h2>{$language === 'bn' ? 'তথ্য নয়, আগে করণীয়।' : 'Actions first, data second.'}</h2>
       <p>{$language === 'bn'
-        ? 'কৃষকের জন্য উত্তরটি হয় সহজ: আজ কী করতে হবে। বিশেষজ্ঞের জন্য একই ডেটা দেখায় কোথায় সমস্যা হচ্ছে, কোন জমি আগে দেখতে হবে এবং কেন।'
-        : 'For farmers, the answer stays simple: what should I do today? For specialists, the same data explains where problems are developing, which fields need attention first, and why.'}</p>
+        ? 'কৃষকের স্ক্রিনে আগে দেখা যাবে পানি দিতে হবে কি না, সমস্যা আছে কি না, আর বৃষ্টির জন্য কী প্রস্তুতি নিতে হবে। প্রয়োজন হলে পরে বিস্তারিত তথ্য দেখা যাবে।'
+        : 'The farmer sees irrigation, crop problems and weather preparation first. Detailed satellite and rover numbers stay available only when needed.'}</p>
     </div>
   </section>
 
   <section class="ag-solutions">
-    <div class="section-heading">
-      <div>
-        <span class="eyebrow">{$language === 'bn' ? 'স্মার্ট ফার্মিং সল্যুশন' : 'Smart farming solutions'}</span>
-        <h2>{$language === 'bn' ? 'বাস্তব ফলাফলের জন্য ডিজাইন করা।' : 'Designed around real outcomes.'}</h2>
-      </div>
-    </div>
-
     <div class="ag-solution-grid">
       <article class="ag-solution primary">
-        <div>
-          <span class="solution-icon">◎</span>
-          <span class="eyebrow">01</span>
-        </div>
-        <div>
-          <h3>{tr($language,'today')}</h3>
-          <p>{$language === 'bn'
-            ? 'মাটির আর্দ্রতা, বৃষ্টি, NDVI এবং মাঠের পর্যবেক্ষণ থেকে সরাসরি করণীয়।'
-            : 'Direct actions from soil moisture, rainfall, NDVI and ground observations.'}</p>
-        </div>
+        <div><span class="solution-icon">🔊</span><span class="eyebrow">01</span></div>
+        <div><h3>{$language === 'bn' ? 'শুনে বুঝুন' : 'Listen instead of read'}</h3><p>{$language === 'bn' ? 'মূল পরামর্শ স্পিকার বোতাম চাপলে পড়ে শোনাবে।' : 'Key advice can be read aloud with the speaker button.'}</p></div>
       </article>
-
       <article class="ag-solution">
         <div class="solution-number">02</div>
-        <div>
-          <span class="solution-icon">↻</span>
-          <h3>{tr($language,'rotation')}</h3>
-          <p>{tr($language,'rotationIntro')}</p>
-        </div>
+        <div><span class="solution-icon">💧</span><h3>{$language === 'bn' ? 'পানি' : 'Water'}</h3><p>{$language === 'bn' ? 'সেচ দেবেন কি দেবেন না, সরাসরি দেখুন।' : 'See directly whether irrigation is needed.'}</p></div>
       </article>
-
       <article class="ag-solution">
         <div class="solution-number">03</div>
-        <div>
-          <span class="solution-icon">⌖</span>
-          <h3>{tr($language,'map')}</h3>
-          <p>{$language === 'bn'
-            ? 'লাইভ GPS, জমির সীমানা, রোভার নমুনা এবং ঝুঁকি একই ভিউতে।'
-            : 'Live GPS, field boundaries, rover samples and risk in one view.'}</p>
-        </div>
+        <div><span class="solution-icon">⚠️</span><h3>{$language === 'bn' ? 'ঝুঁকি' : 'Risk'}</h3><p>{$language === 'bn' ? 'রঙ, ছবি এবং সহজ কথায় আগাম সতর্কতা।' : 'Warnings through color, icons and simple language.'}</p></div>
       </article>
     </div>
   </section>

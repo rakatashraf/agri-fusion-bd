@@ -15,10 +15,10 @@
   </a>
 
   <nav class="desktop-nav">
-    <a href={appPath('/')}>{tr($language,'home')}</a>
-    <a href={dashboardHref}>{tr($language,'dashboard')}</a>
-    <a href={appPath('/map')}>{tr($language,'map')}</a>
-    <a href={appPath('/account')}>{tr($language,'account')}</a>
+    <a href={appPath('/')}><span>🏠</span><span>{tr($language,'home')}</span></a>
+    <a href={dashboardHref}><span>🌾</span><span>{tr($language,'dashboard')}</span></a>
+    <a href={appPath('/map')}><span>📍</span><span>{tr($language,'map')}</span></a>
+    <a href={appPath('/account')}><span>👤</span><span>{tr($language,'account')}</span></a>
   </nav>
 
   <div class="header-actions">
@@ -38,7 +38,7 @@
 </header>
 
 <nav class="mobile-nav">
-  <a href={dashboardHref}><span>⌂</span>{tr($language,'home')}</a>
-  <a href={appPath('/map')}><span>⌖</span>{tr($language,'map')}</a>
-  <a href={appPath('/account')}><span>◎</span>{tr($language,'account')}</a>
+  <a href={dashboardHref}><span>🌾</span>{tr($language,'home')}</a>
+  <a href={appPath('/map')}><span>📍</span>{tr($language,'map')}</a>
+  <a href={appPath('/account')}><span>👤</span>{tr($language,'account')}</a>
 </nav>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import VoiceGuide from '$lib/components/VoiceGuide.svelte';
   import { areas } from '$lib/data';
   import { language, setSession } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
@@ -13,6 +14,10 @@
   let role: 'farmer' | 'specialist' = 'farmer';
   let areaId = 'paba';
   let error = '';
+
+  $: loginVoice = $language === 'bn'
+    ? 'মোবাইল নম্বর বা ইমেইল লিখুন। তারপর চার সংখ্যার পাসকোড লিখে লগইন চাপুন।'
+    : 'Enter your mobile number or email, then enter your passcode and press login.';
 
   function submit() {
     error = '';
@@ -51,42 +56,45 @@
   <section class="auth-card">
     <div class="auth-intro">
       <span class="eyebrow">AgriFusion BD</span>
-      <h1>{$language === 'bn' ? 'আপনার জমি, আপনার তথ্য' : 'Your fields, your insights'}</h1>
-      <p>{tr($language,'privacy')}</p>
+      <h1>{$language === 'bn' ? 'সহজে ঢুকুন' : 'Simple sign in'}</h1>
+      <p>{$language === 'bn' ? 'আপনার নিজের জমির তথ্য দেখতে অ্যাকাউন্ট ব্যবহার করুন।' : 'Use your account to see your own farm information.'}</p>
+      <VoiceGuide text={loginVoice} />
     </div>
 
     <div class="tab-switch">
-      <button class:active={mode === 'login'} on:click={() => mode='login'}>{tr($language,'login')}</button>
-      <button class:active={mode === 'register'} on:click={() => mode='register'}>{tr($language,'createAccount')}</button>
+      <button class:active={mode === 'login'} on:click={() => mode='login'}>🔑 {tr($language,'login')}</button>
+      <button class:active={mode === 'register'} on:click={() => mode='register'}>＋ {tr($language,'createAccount')}</button>
     </div>
 
     <form on:submit|preventDefault={submit} class="form-stack">
       {#if mode === 'register'}
-        <label>{tr($language,'name')}<input bind:value={name} autocomplete="name" /></label>
-        <label>{tr($language,'role')}
-          <select bind:value={role}>
-            <option value="farmer">{tr($language,'farmer')}</option>
-            <option value="specialist">{tr($language,'specialist')}</option>
-          </select>
-        </label>
-        <label>{tr($language,'area')}
+        <label>👤 {tr($language,'name')}<input bind:value={name} autocomplete="name" /></label>
+
+        <div>
+          <span class="eyebrow">{$language === 'bn' ? 'আপনি কে?' : 'Who are you?'}</span>
+          <div class="role-choice-row">
+            <button type="button" class="role-choice" class:active={role==='farmer'} on:click={() => role='farmer'}><span>👨‍🌾</span>{tr($language,'farmer')}</button>
+            <button type="button" class="role-choice" class:active={role==='specialist'} on:click={() => role='specialist'}><span>🧑‍🔬</span>{tr($language,'specialist')}</button>
+          </div>
+        </div>
+
+        <label>🗺️ {tr($language,'area')}
           <select bind:value={areaId}>{#each areas as area}<option value={area.id}>{localText(area.name,$language)}</option>{/each}</select>
         </label>
       {/if}
-      <label>{tr($language,'identifier')}<input bind:value={identifier} autocomplete="username" /></label>
-      <label>{tr($language,'password')}<input type="password" bind:value={password} autocomplete="current-password" /></label>
-      {#if error}<p class="form-error">{error}</p>{/if}
-      <button class="button primary full" type="submit">{mode === 'login' ? tr($language,'login') : tr($language,'createAccount')}</button>
+
+      <label>📱 {tr($language,'identifier')}<input bind:value={identifier} inputmode="tel" autocomplete="username" /></label>
+      <label>🔒 {tr($language,'password')}<input type="password" bind:value={password} inputmode="numeric" autocomplete="current-password" /></label>
+      {#if error}<p class="form-error">⚠️ {error}</p>{/if}
+      <button class="button primary full" type="submit">{mode === 'login' ? '🔑 ' + tr($language,'login') : '✅ ' + tr($language,'createAccount')}</button>
     </form>
 
     <div class="demo-box">
-      <strong>{tr($language,'demoAccess')}</strong>
+      <strong>{$language === 'bn' ? 'এক চাপেই ডেমো দেখুন' : 'Open a demo in one tap'}</strong>
       <div class="demo-actions">
-        {#each demoCredentials as item}
-          <button class="button secondary small" on:click={() => useDemo(item)}>{item.label}</button>
-        {/each}
+        <button class="button secondary" on:click={() => useDemo(demoCredentials[0])}>👨‍🌾 {$language === 'bn' ? 'কৃষক ডেমো' : 'Farmer demo'}</button>
+        <button class="button secondary" on:click={() => useDemo(demoCredentials[1])}>🧑‍🔬 {$language === 'bn' ? 'বিশেষজ্ঞ ডেমো' : 'Specialist demo'}</button>
       </div>
-      <small>{$language === 'bn' ? 'ডেমো পাসকোড: 1234' : 'Demo passcode: 1234'}</small>
     </div>
   </section>
 </main>
