@@ -15,9 +15,10 @@
   </a>
 
   <nav class="desktop-nav">
-    <a href={dashboardHref}>{tr($language, 'dashboard')}</a>
-    <a href={appPath('/map')}>{tr($language, 'map')}</a>
-    <a href={appPath('/account')}>{tr($language, 'account')}</a>
+    <a href={appPath('/')}>{tr($language,'home')}</a>
+    <a href={dashboardHref}>{tr($language,'dashboard')}</a>
+    <a href={appPath('/map')}>{tr($language,'map')}</a>
+    <a href={appPath('/account')}>{tr($language,'account')}</a>
   </nav>
 
   <div class="header-actions">
