@@ -2,6 +2,12 @@
 
 A redesigned derivative of `baseplate-admin/nasa-space-apps-web`, focused on Bangladeshi farmers first and agriculture specialists second.
 
+## Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Frakatashraf%2Fagri-fusion-bd&project-name=agri-fusion-bd&repository-name=agri-fusion-bd)
+
+The repository includes `vercel.json` and is configured for SvelteKit deployment on Vercel.
+
 ## Product structure
 
 - `/farmer` - Bangla-first action dashboard: what to do today, why, likely cost/water impact, weather preparation, targeted pest scouting and intercropping ideas.
