@@ -3,6 +3,7 @@
   import { language, session } from '$lib/stores/app';
   import { tr } from '$lib/i18n';
   import { appPath } from '$lib/nav';
+  import { farmPhotos } from '$lib/images';
 
   $: dashboardHref = appPath($session?.role === 'specialist' ? '/specialist' : '/farmer');
   $: introVoice = $language === 'bn'
@@ -45,19 +46,27 @@
 
     <div class="entry-choice-grid">
       <a class="entry-choice farmer" href={$session?.role === 'farmer' ? dashboardHref : appPath('/login')}>
-        <span class="big-icon">👨‍🌾</span>
-        <strong>{$language === 'bn' ? 'আমি কৃষক' : 'I am a farmer'}</strong>
-        <span>{$language === 'bn' ? 'আজ কী করব দেখুন' : 'See what to do today'}</span>
+        <img class="entry-photo" src={farmPhotos.farmer} alt="" loading="lazy" />
+        <div class="entry-choice-body">
+          <strong>👨‍🌾 {$language === 'bn' ? 'আমি কৃষক' : 'I am a farmer'}</strong>
+          <span>{$language === 'bn' ? 'আজ কী করব দেখুন' : 'See what to do today'}</span>
+        </div>
       </a>
+
       <a class="entry-choice specialist" href={$session?.role === 'specialist' ? dashboardHref : appPath('/login')}>
-        <span class="big-icon">🧑‍🔬</span>
-        <strong>{$language === 'bn' ? 'আমি কৃষি বিশেষজ্ঞ' : 'I am a specialist'}</strong>
-        <span>{$language === 'bn' ? 'এলাকার সব জমি দেখুন' : 'See fields across an area'}</span>
+        <img class="entry-photo" src={farmPhotos.specialist} alt="" loading="lazy" />
+        <div class="entry-choice-body">
+          <strong>🧑‍🔬 {$language === 'bn' ? 'আমি কৃষি বিশেষজ্ঞ' : 'I am a specialist'}</strong>
+          <span>{$language === 'bn' ? 'এলাকার সব জমি দেখুন' : 'See fields across an area'}</span>
+        </div>
       </a>
+
       <a class="entry-choice map" href={appPath('/map')}>
-        <span class="big-icon">🗺️</span>
-        <strong>{$language === 'bn' ? 'ম্যাপ দেখুন' : 'Open map'}</strong>
-        <span>{$language === 'bn' ? 'GPS ও জমির অবস্থান' : 'GPS and field locations'}</span>
+        <img class="entry-photo" src={farmPhotos.aerial} alt="" loading="lazy" />
+        <div class="entry-choice-body">
+          <strong>🗺️ {$language === 'bn' ? 'ম্যাপ দেখুন' : 'Open map'}</strong>
+          <span>{$language === 'bn' ? 'GPS ও জমির অবস্থান' : 'GPS and field locations'}</span>
+        </div>
       </a>
     </div>
   </section>
@@ -78,13 +87,23 @@
         <div><span class="solution-icon">🔊</span><span class="eyebrow">01</span></div>
         <div><h3>{$language === 'bn' ? 'শুনে বুঝুন' : 'Listen instead of read'}</h3><p>{$language === 'bn' ? 'মূল পরামর্শ স্পিকার বোতাম চাপলে পড়ে শোনাবে।' : 'Key advice can be read aloud with the speaker button.'}</p></div>
       </article>
+
       <article class="ag-solution">
-        <div class="solution-number">02</div>
-        <div><span class="solution-icon">💧</span><h3>{$language === 'bn' ? 'পানি' : 'Water'}</h3><p>{$language === 'bn' ? 'সেচ দেবেন কি দেবেন না, সরাসরি দেখুন।' : 'See directly whether irrigation is needed.'}</p></div>
+        <img class="solution-photo" src={farmPhotos.irrigation} alt="" loading="lazy" />
+        <div>
+          <span class="solution-icon">💧</span>
+          <h3>{$language === 'bn' ? 'পানি' : 'Water'}</h3>
+          <p>{$language === 'bn' ? 'সেচ দেবেন কি দেবেন না, সরাসরি দেখুন।' : 'See directly whether irrigation is needed.'}</p>
+        </div>
       </article>
+
       <article class="ag-solution">
-        <div class="solution-number">03</div>
-        <div><span class="solution-icon">⚠️</span><h3>{$language === 'bn' ? 'ঝুঁকি' : 'Risk'}</h3><p>{$language === 'bn' ? 'রঙ, ছবি এবং সহজ কথায় আগাম সতর্কতা।' : 'Warnings through color, icons and simple language.'}</p></div>
+        <img class="solution-photo" src={farmPhotos.storm} alt="" loading="lazy" />
+        <div>
+          <span class="solution-icon">⚠️</span>
+          <h3>{$language === 'bn' ? 'ঝুঁকি' : 'Risk'}</h3>
+          <p>{$language === 'bn' ? 'রঙ, ছবি এবং সহজ কথায় আগাম সতর্কতা।' : 'Warnings through color, photos and simple language.'}</p>
+        </div>
       </article>
     </div>
   </section>

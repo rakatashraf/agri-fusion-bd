@@ -6,6 +6,7 @@
   import { tr, localText } from '$lib/i18n';
   import { loginAccount, registerAccount, demoCredentials } from '$lib/auth';
   import { appPath } from '$lib/nav';
+  import { farmPhotos } from '$lib/images';
 
   let mode: 'login' | 'register' = 'login';
   let name = '';
@@ -53,7 +54,9 @@
 <svelte:head><title>{tr($language,'login')} | AgriFusion BD</title></svelte:head>
 
 <main class="page narrow">
-  <section class="auth-card">
+  <section class="auth-card photo-auth-card">
+    <img class="auth-card-photo" src={role === 'specialist' ? farmPhotos.specialist : farmPhotos.farmer} alt="" loading="lazy" />
+
     <div class="auth-intro">
       <span class="eyebrow">AgriFusion BD</span>
       <h1>{$language === 'bn' ? 'সহজে ঢুকুন' : 'Simple sign in'}</h1>
@@ -73,8 +76,14 @@
         <div>
           <span class="eyebrow">{$language === 'bn' ? 'আপনি কে?' : 'Who are you?'}</span>
           <div class="role-choice-row">
-            <button type="button" class="role-choice" class:active={role==='farmer'} on:click={() => role='farmer'}><span>👨‍🌾</span>{tr($language,'farmer')}</button>
-            <button type="button" class="role-choice" class:active={role==='specialist'} on:click={() => role='specialist'}><span>🧑‍🔬</span>{tr($language,'specialist')}</button>
+            <button type="button" class="role-choice photo-role-choice" class:active={role==='farmer'} on:click={() => role='farmer'}>
+              <img src={farmPhotos.farmer} alt="" loading="lazy" />
+              <span>👨‍🌾</span>{tr($language,'farmer')}
+            </button>
+            <button type="button" class="role-choice photo-role-choice" class:active={role==='specialist'} on:click={() => role='specialist'}>
+              <img src={farmPhotos.specialist} alt="" loading="lazy" />
+              <span>🧑‍🔬</span>{tr($language,'specialist')}
+            </button>
           </div>
         </div>
 
@@ -89,7 +98,8 @@
       <button class="button primary full" type="submit">{mode === 'login' ? '🔑 ' + tr($language,'login') : '✅ ' + tr($language,'createAccount')}</button>
     </form>
 
-    <div class="demo-box">
+    <div class="demo-box photo-demo-box">
+      <img src={farmPhotos.aerial} alt="" loading="lazy" />
       <strong>{$language === 'bn' ? 'এক চাপেই ডেমো দেখুন' : 'Open a demo in one tap'}</strong>
       <div class="demo-actions">
         <button class="button secondary" on:click={() => useDemo(demoCredentials[0])}>👨‍🌾 {$language === 'bn' ? 'কৃষক ডেমো' : 'Farmer demo'}</button>

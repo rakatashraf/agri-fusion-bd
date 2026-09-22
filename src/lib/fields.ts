@@ -46,18 +46,28 @@ export function loadUserFields() {
   userFields.set(readStored());
 }
 
-function squareBoundary(lat: number, lng: number, areaHa: number): [number, number][] {
-  const sideM = Math.sqrt(Math.max(areaHa, 0.01) * 10000);
-  const latDelta = (sideM / 2) / 111320;
-  const lngScale = Math.max(Math.cos(lat * Math.PI / 180), 0.2);
-  const lngDelta = (sideM / 2) / (111320 * lngScale);
+export function polygonCenter(points: [number, number][]): [number, number] {
+  if (!points.length) return [23.8103, 90.4125];
+  const lat = points.reduce((sum, p) => sum + p[0], 0) / points.length;
+  const lng = points.reduce((sum, p) => sum + p[1], 0) / points.length;
+  return [Number(lat.toFixed(7)), Number(lng.toFixed(7))];
+}
 
-  return [
-    [lat + latDelta, lng - lngDelta],
-    [lat + latDelta, lng + lngDelta],
-    [lat - latDelta, lng + lngDelta],
-    [lat - latDelta, lng - lngDelta]
-  ];
+export function polygonAreaHa(points: [number, number][]) {
+  if (points.length < 3) return 0;
+
+  const centerLat = points.reduce((sum, p) => sum + p[0], 0) / points.length;
+  const metersPerLng = 111320 * Math.cos(centerLat * Math.PI / 180);
+  const xy = points.map(([lat, lng]) => [lng * metersPerLng, lat * 111320]);
+
+  let area = 0;
+  for (let i = 0; i < xy.length; i++) {
+    const [x1, y1] = xy[i];
+    const [x2, y2] = xy[(i + 1) % xy.length];
+    area += x1 * y2 - x2 * y1;
+  }
+
+  return Math.abs(area) / 2 / 10000;
 }
 
 export function createFarmerField(input: {
@@ -66,11 +76,17 @@ export function createFarmerField(input: {
   name: string;
   crop: string;
   nextCrop?: string;
-  areaHa: number;
-  latitude: number;
-  longitude: number;
+  areaHa?: number;
+  boundary: [number, number][];
 }) {
+  if (input.boundary.length < 3) {
+    throw new Error('A field boundary requires at least three map points.');
+  }
+
   const now = new Date();
+  const measuredArea = polygonAreaHa(input.boundary);
+  const center = polygonCenter(input.boundary);
+
   const newField: FarmerField = {
     id: `field-local-${Date.now()}`,
     farmerId: input.farmerId,
@@ -78,7 +94,7 @@ export function createFarmerField(input: {
     name: { bn: input.name, en: input.name },
     crop: { bn: input.crop, en: input.crop },
     nextCrop: { bn: input.nextCrop || 'নির্ধারিত নয়', en: input.nextCrop || 'Not selected' },
-    areaHa: input.areaHa,
+    areaHa: Number((measuredArea || input.areaHa || 0).toFixed(2)),
     health: 0,
     soilMoisture: 0,
     ndvi: 0,
@@ -86,8 +102,8 @@ export function createFarmerField(input: {
     savingBdt: 0,
     waterSavedL: 0,
     updated: now.toLocaleString(),
-    center: [input.latitude, input.longitude],
-    boundary: squareBoundary(input.latitude, input.longitude, input.areaHa),
+    center,
+    boundary: input.boundary,
     action: {
       bn: 'নতুন জমি যোগ হয়েছে। স্যাটেলাইট ও রোভার ডেটা যুক্ত হলে ব্যক্তিগত পরামর্শ এখানে দেখা যাবে।',
       en: 'Field added. Personalized recommendations will appear after satellite and rover observations are connected.'

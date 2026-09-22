@@ -1,0 +1,247 @@
+/* Additional photo treatments for remaining cards */
+
+.photo-empty-state {
+  display: grid !important;
+  grid-template-columns: minmax(180px, .8fr) minmax(0, 1.2fr);
+  gap: 24px;
+  align-items: center;
+  text-align: left !important;
+  padding: 0 !important;
+  overflow: hidden;
+  background: #fffdf8;
+  border: 1px solid rgba(29,58,42,.1);
+}
+
+.photo-empty-state > img {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  object-fit: cover;
+}
+
+.photo-empty-state > div {
+  padding: 28px 28px 28px 0;
+}
+
+.photo-page-title {
+  display: grid !important;
+  grid-template-columns: 180px minmax(0,1fr) auto !important;
+  overflow: hidden;
+  padding: 0 24px 0 0 !important;
+}
+
+.photo-page-title > img {
+  width: 180px;
+  height: 100%;
+  min-height: 150px;
+  object-fit: cover;
+}
+
+.photo-page-title > div:not(.health-pill) {
+  padding-block: 22px;
+}
+
+.photo-page-title > .area-select,
+.photo-page-title > .health-pill {
+  align-self: center;
+}
+
+.map-field-photo-card {
+  grid-template-columns: 82px auto minmax(0,1fr) auto !important;
+  padding: 0 12px 0 0 !important;
+  overflow: hidden;
+  min-height: 82px;
+}
+
+.map-field-photo {
+  width: 82px;
+  height: 100%;
+  min-height: 82px;
+  object-fit: cover;
+}
+
+.photo-profile-card {
+  display: grid !important;
+  grid-template-columns: 150px auto minmax(0,1fr);
+  padding: 0 22px 0 0 !important;
+  overflow: hidden;
+}
+
+.photo-profile-card > img {
+  width: 150px;
+  height: 100%;
+  min-height: 140px;
+  object-fit: cover;
+}
+
+.photo-info-list > div {
+  display: grid !important;
+  grid-template-columns: 74px minmax(0,1fr) auto;
+  padding: 0 14px 0 0 !important;
+  min-height: 74px;
+  align-items: center;
+}
+
+.photo-info-list > div > img {
+  width: 74px;
+  height: 74px;
+  object-fit: cover;
+}
+
+.photo-auth-card {
+  padding-top: 0 !important;
+  overflow: hidden;
+}
+
+.auth-card-photo {
+  width: calc(100% + clamp(40px, 10vw, 84px));
+  height: 190px;
+  object-fit: cover;
+  margin-left: calc(clamp(20px, 5vw, 42px) * -1);
+  margin-bottom: 26px;
+}
+
+.photo-role-choice {
+  padding: 0 0 14px !important;
+  overflow: hidden;
+}
+
+.photo-role-choice > img {
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.photo-demo-box {
+  padding: 0 13px 13px !important;
+  overflow: hidden;
+}
+
+.photo-demo-box > img {
+  width: calc(100% + 26px);
+  height: 92px;
+  object-fit: cover;
+  margin: 0 -13px 12px;
+}
+
+.wizard-step-photo {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  border-radius: 22px;
+  margin-bottom: 18px;
+}
+
+.wizard-step-photo.boundary-photo {
+  height: 150px;
+}
+
+.photo-field-report {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.field-report-photo {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.field-report-body {
+  padding: 18px;
+}
+
+@media (max-width: 800px) {
+  .photo-page-title {
+    grid-template-columns: 130px minmax(0,1fr) !important;
+    padding: 0 18px 0 0 !important;
+  }
+
+  .photo-page-title > img {
+    width: 130px;
+  }
+
+  .photo-page-title > .area-select,
+  .photo-page-title > .health-pill {
+    grid-column: 1 / -1;
+    width: calc(100% - 18px) !important;
+    margin: 0 0 18px 18px;
+  }
+
+  .photo-empty-state {
+    grid-template-columns: 1fr !important;
+  }
+
+  .photo-empty-state > img {
+    min-height: 190px;
+    height: 190px;
+  }
+
+  .photo-empty-state > div {
+    padding: 0 22px 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .photo-page-title {
+    grid-template-columns: 1fr !important;
+    padding: 0 !important;
+  }
+
+  .photo-page-title > img {
+    width: 100%;
+    height: 155px;
+    min-height: 155px;
+  }
+
+  .photo-page-title > div:not(.health-pill) {
+    padding: 18px;
+  }
+
+  .photo-page-title > .area-select,
+  .photo-page-title > .health-pill {
+    width: calc(100% - 36px) !important;
+    margin: 0 18px 18px;
+  }
+
+  .photo-profile-card {
+    grid-template-columns: 90px auto minmax(0,1fr);
+  }
+
+  .photo-profile-card > img {
+    width: 90px;
+    min-height: 128px;
+  }
+
+  .photo-info-list > div {
+    grid-template-columns: 58px minmax(0,1fr);
+    padding-right: 10px !important;
+  }
+
+  .photo-info-list > div > img {
+    width: 58px;
+    height: 68px;
+    grid-row: 1 / span 2;
+  }
+
+  .photo-info-list > div > strong {
+    grid-column: 2;
+  }
+
+  .map-field-photo-card {
+    grid-template-columns: 70px auto minmax(0,1fr) auto !important;
+  }
+
+  .map-field-photo {
+    width: 70px;
+  }
+
+  .wizard-step-photo {
+    height: 150px;
+  }
+
+  .field-report-photo {
+    height: 150px;
+  }
+}

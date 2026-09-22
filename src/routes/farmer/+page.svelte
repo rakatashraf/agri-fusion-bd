@@ -3,11 +3,12 @@
   import LiveGpsMap from '$lib/components/LiveGpsMap.svelte';
   import VoiceGuide from '$lib/components/VoiceGuide.svelte';
   import SimpleStatus from '$lib/components/SimpleStatus.svelte';
-  import { fields, rotationPlans, alerts } from '$lib/data';
+  import { fields, rotationPlans } from '$lib/data';
   import { language, session } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
   import { appPath } from '$lib/nav';
   import { userFields, loadUserFields, removeFarmerField } from '$lib/fields';
+  import { cropPhoto, farmPhotos, rotationPhoto } from '$lib/images';
 
   let selectedFieldId = '';
 
@@ -89,15 +90,17 @@
   </section>
 
   {#if myFields.length === 0}
-    <section class="empty-state field-empty">
-      <div class="empty-icon">🌱</div>
-      <h2>{$language === 'bn' ? 'প্রথম জমি যোগ করুন' : 'Add your first field'}</h2>
-      <p>{$language === 'bn'
-        ? 'শুধু জমির নাম, ফসল, আয়তন এবং GPS অবস্থান দিন।'
-        : 'Just provide the field name, crop, size and GPS location.'}</p>
-      <a class="button primary" href={appPath('/farmer/fields/new')}>
-        {$language === 'bn' ? '＋ জমি যোগ করুন' : '＋ Add field'}
-      </a>
+    <section class="empty-state field-empty photo-empty-state">
+      <img src={farmPhotos.farmer} alt="" loading="lazy" />
+      <div>
+        <h2>{$language === 'bn' ? 'প্রথম জমি যোগ করুন' : 'Add your first field'}</h2>
+        <p>{$language === 'bn'
+          ? 'জমির নাম ও ফসল দিন, তারপর ম্যাপে জমির আসল সীমানার চারপাশে পয়েন্ট দিন।'
+          : 'Enter the field name and crop, then tap around the real field boundary on the map.'}</p>
+        <a class="button primary" href={appPath('/farmer/fields/new')}>
+          {$language === 'bn' ? '＋ জমি যোগ করুন' : '＋ Add field'}
+        </a>
+      </div>
     </section>
   {:else}
     <section class="field-picker-label">
@@ -116,15 +119,18 @@
           class:active={primary?.id === field.id}
           on:click={() => selectedFieldId = field.id}
         >
-          <div class="field-card-top">
-            <span class="field-index">{index + 1}</span>
-            <span class="risk-badge {field.risk}">{field.risk === 'high' ? '⚠️' : field.risk === 'medium' ? '●' : '✓'}</span>
-          </div>
-          <strong>🌾 {localText(field.name,$language)}</strong>
-          <span>{localText(field.crop,$language)} • {field.areaHa} ha</span>
-          <div class="field-card-health">
-            <span>{$language === 'bn' ? 'অবস্থা' : 'Condition'}</span>
-            <b>{field.health ? field.health + '/100' : 'নতুন'}</b>
+          <img class="field-card-photo" src={cropPhoto(localText(field.crop,'en'))} alt={localText(field.crop,$language)} loading="lazy" />
+          <div class="field-card-content">
+            <div class="field-card-top">
+              <span class="field-index">{index + 1}</span>
+              <span class="risk-badge {field.risk}">{field.risk === 'high' ? '⚠️' : field.risk === 'medium' ? '●' : '✓'}</span>
+            </div>
+            <strong>🌾 {localText(field.name,$language)}</strong>
+            <span>{localText(field.crop,$language)} • {field.areaHa} ha</span>
+            <div class="field-card-health">
+              <span>{$language === 'bn' ? 'অবস্থা' : 'Condition'}</span>
+              <b>{field.health ? field.health + '/100' : ($language === 'bn' ? 'নতুন' : 'New')}</b>
+            </div>
           </div>
         </button>
       {/each}
@@ -136,7 +142,10 @@
     </div>
 
     {#if primary}
-      <section class="today-board">
+      <section
+        class="today-board"
+        style={`--today-photo:url("${cropPhoto(localText(primary.crop,'en'))}")`}
+      >
         <div class="today-icon">☀️</div>
         <div class="today-copy">
           <span class="eyebrow">{$language === 'bn' ? 'আজ কী করবেন' : 'What to do today'}</span>
@@ -147,15 +156,15 @@
       </section>
 
       <section class="simple-action-grid" aria-label={$language === 'bn' ? 'আজকের সহজ পরামর্শ' : 'Simple actions for today'}>
-        <SimpleStatus icon="💧" title={irrigation.title} text={irrigation.text} tone={irrigation.tone}>
+        <SimpleStatus image={farmPhotos.irrigation} icon="💧" title={irrigation.title} text={irrigation.text} tone={irrigation.tone}>
           <VoiceGuide text={`${irrigation.title}. ${irrigation.text}`} compact={true} />
         </SimpleStatus>
 
-        <SimpleStatus icon="🐛" title={pest.title} text={pest.text} tone={pest.tone}>
+        <SimpleStatus image={farmPhotos.pest} icon="🐛" title={pest.title} text={pest.text} tone={pest.tone}>
           <VoiceGuide text={`${pest.title}. ${pest.text}`} compact={true} />
         </SimpleStatus>
 
-        <SimpleStatus icon="🌧️" title={$language === 'bn' ? 'বৃষ্টির জন্য প্রস্তুত থাকুন' : 'Prepare for rain'} text={weatherText} tone="warn">
+        <SimpleStatus image={farmPhotos.storm} icon="🌧️" title={$language === 'bn' ? 'বৃষ্টির জন্য প্রস্তুত থাকুন' : 'Prepare for rain'} text={weatherText} tone="warn">
           <VoiceGuide text={weatherText} compact={true} />
         </SimpleStatus>
       </section>
@@ -163,17 +172,17 @@
       <details class="tech-details">
         <summary>{$language === 'bn' ? 'আরও তথ্য দেখুন' : 'See more details'}</summary>
         <section class="metric-grid">
-          <article><span>💧 {tr($language,'soilMoisture')}</span><strong>{primary.soilMoisture ? primary.soilMoisture + '%' : '—'}</strong><small>{tr($language,'roverLayer')}</small></article>
-          <article><span>🌿 NDVI</span><strong>{primary.ndvi || '—'}</strong><small>{tr($language,'nasaLayer')}</small></article>
-          <article><span>💰 {tr($language,'savings')}</span><strong>{primary.savingBdt ? '৳' + primary.savingBdt : '—'}</strong><small>{$language === 'bn' ? 'সম্ভাব্য' : 'Potential'}</small></article>
-          <article><span>🚿 {tr($language,'waterSaved')}</span><strong>{primary.waterSavedL ? primary.waterSavedL + ' L' : '—'}</strong><small>{$language === 'bn' ? 'সম্ভাব্য' : 'Potential'}</small></article>
+          <article><img class="metric-card-photo" src={farmPhotos.watering} alt="" loading="lazy" /><span>💧 {tr($language,'soilMoisture')}</span><strong>{primary.soilMoisture ? primary.soilMoisture + '%' : '—'}</strong><small>{tr($language,'roverLayer')}</small></article>
+          <article><img class="metric-card-photo" src={cropPhoto(localText(primary.crop,'en'))} alt="" loading="lazy" /><span>🌿 NDVI</span><strong>{primary.ndvi || '—'}</strong><small>{tr($language,'nasaLayer')}</small></article>
+          <article><img class="metric-card-photo" src={farmPhotos.specialist} alt="" loading="lazy" /><span>💰 {tr($language,'savings')}</span><strong>{primary.savingBdt ? '৳' + primary.savingBdt : '—'}</strong><small>{$language === 'bn' ? 'সম্ভাব্য' : 'Potential'}</small></article>
+          <article><img class="metric-card-photo" src={farmPhotos.irrigation} alt="" loading="lazy" /><span>🚿 {tr($language,'waterSaved')}</span><strong>{primary.waterSavedL ? primary.waterSavedL + ' L' : '—'}</strong><small>{$language === 'bn' ? 'সম্ভাব্য' : 'Potential'}</small></article>
         </section>
       </details>
 
       <section class="content-section">
         <div class="farmer-section-title">
           <div class="section-picto">📍</div>
-          <div><h2>{$language === 'bn' ? 'আমার জমি কোথায়?' : 'Where is my field?'}</h2><p>{$language === 'bn' ? 'GPS দিয়ে জমি ও নিজের অবস্থান দেখুন।' : 'See your field and your live GPS position.'}</p></div>
+          <div><h2>{$language === 'bn' ? 'আমার জমি কোথায়?' : 'Where is my field?'}</h2><p>{$language === 'bn' ? 'GPS দিয়ে জমির আসল সীমানা ও নিজের অবস্থান দেখুন।' : 'See the real field polygon and your live GPS position.'}</p></div>
         </div>
         <LiveGpsMap fields={[primary]} height="330px" />
       </section>
@@ -186,6 +195,7 @@
         <div class="rotation-list">
           {#each rotationPlans as plan, index}
             <article class:recommended={index === 0}>
+              <img class="rotation-photo" src={rotationPhoto(index)} alt="" loading="lazy" />
               <div class="rotation-rank">{index + 1}</div>
               <div class="rotation-main">
                 <strong>🌱 {localText(plan.sequence,$language)}</strong>

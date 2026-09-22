@@ -5,6 +5,7 @@
   import { language, session, specialistArea, setSpecialistArea } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
   import { userFields, loadUserFields } from '$lib/fields';
+  import { cropPhoto } from '$lib/images';
 
   onMount(loadUserFields);
 
@@ -19,7 +20,7 @@
 
 <main class="page">
   <section class="page-title map-title">
-    <div><span class="eyebrow">GPS + field boundaries</span><h1>{tr($language,'map')}</h1><p>{$language === 'bn' ? 'আপনার অবস্থান, জমির সীমানা এবং ঝুঁকি একই মানচিত্রে।' : 'Your position, field boundaries and risk in one map.'}</p></div>
+    <div><span class="eyebrow">GPS + field boundaries</span><h1>{tr($language,'map')}</h1><p>{$language === 'bn' ? 'আপনার অবস্থান, জমির আসল polygon সীমানা এবং ঝুঁকি একই মানচিত্রে।' : 'Your position, real field polygons and risk in one map.'}</p></div>
     {#if $session?.role === 'specialist'}
       <label class="area-select">{tr($language,'responsibleArea')}
         <select value={$specialistArea} on:change={(e) => setSpecialistArea(e.currentTarget.value)}>
@@ -37,7 +38,8 @@
     </div>
     <div class="map-field-list">
       {#each visibleFields as field}
-        <article>
+        <article class="map-field-photo-card">
+          <img class="map-field-photo" src={cropPhoto(localText(field.crop,'en'))} alt="" loading="lazy" />
           <span class="status-dot {field.risk}"></span>
           <div><strong>{localText(field.name,$language)}</strong><small>{localText(field.crop,$language)} • {field.areaHa} ha</small></div>
           <div class="mini-health">{field.health || '—'}</div>

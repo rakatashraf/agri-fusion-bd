@@ -1,0 +1,385 @@
+/* Relevant photography + real field-boundary mapping */
+
+.card-photo,
+.metric-card-photo,
+.rotation-photo,
+.specialist-card-photo,
+.farmer-thumb,
+.entry-photo,
+.solution-photo {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  background: #dfe7dd;
+}
+
+.field-select-card {
+  overflow: hidden !important;
+  padding: 0 !important;
+  align-content: stretch !important;
+}
+
+.field-card-photo {
+  width: 100%;
+  height: 112px;
+  object-fit: cover;
+  display: block;
+}
+
+.field-card-content {
+  padding: 14px 16px 16px;
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.field-card-content .field-card-top {
+  margin-bottom: 1px;
+}
+
+.field-add-card {
+  overflow: hidden;
+  position: relative;
+  background:
+    linear-gradient(rgba(244,241,232,.78), rgba(244,241,232,.92)),
+    url('https://images.unsplash.com/photo-1558289282-647de9fdf608?auto=format&fit=crop&w=800&q=70') center/cover !important;
+}
+
+.today-board {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.today-board::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(29,58,42,.97) 0%, rgba(29,58,42,.9) 52%, rgba(29,58,42,.56) 100%),
+    var(--today-photo, url('https://images.unsplash.com/photo-1558289282-647de9fdf608?auto=format&fit=crop&w=1200&q=75')) center/cover;
+  z-index: -1;
+}
+
+.simple-status {
+  padding-top: 126px !important;
+  overflow: hidden;
+  position: relative;
+}
+
+.simple-status-photo {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+}
+
+.metric-grid article,
+.metric-grid > div,
+.specialist-metrics article {
+  overflow: hidden;
+  position: relative;
+}
+
+.metric-card-photo {
+  height: 72px;
+  margin: -19px -20px 13px;
+  width: calc(100% + 40px);
+}
+
+.rotation-list article {
+  overflow: hidden;
+}
+
+.rotation-photo {
+  width: 92px;
+  height: 78px;
+  border-radius: 14px;
+  grid-row: 1 / span 2;
+}
+
+.rotation-list article:has(.rotation-photo) {
+  grid-template-columns: 92px auto minmax(0,1fr) auto !important;
+}
+
+.entry-choice {
+  overflow: hidden;
+  padding: 0 !important;
+  align-content: stretch !important;
+}
+
+.entry-photo {
+  height: 130px;
+}
+
+.entry-choice-body {
+  padding: 16px 18px 19px;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.ag-solution {
+  overflow: hidden;
+}
+
+.ag-solution:not(.primary) {
+  padding: 0 !important;
+}
+
+.ag-solution:not(.primary) > div:not(.solution-number) {
+  padding: 20px 22px 24px;
+}
+
+.ag-solution .solution-photo {
+  height: 155px;
+}
+
+.farmer-row {
+  grid-template-columns: 62px minmax(0,1fr) auto auto !important;
+}
+
+.farmer-thumb {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+}
+
+.summary-panel > div {
+  overflow: hidden;
+}
+
+.summary-card-photo {
+  width: calc(100% + 44px);
+  height: 85px;
+  margin: -22px -22px 15px;
+  object-fit: cover;
+}
+
+/* Boundary editor */
+.boundary-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.boundary-instruction {
+  display: grid;
+  grid-template-columns: 52px minmax(0,1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 18px;
+  background: #e7f0df;
+  border: 1px solid rgba(29,58,42,.12);
+}
+
+.boundary-instruction-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: white;
+  font-size: 1.65rem;
+}
+
+.boundary-instruction > div:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.boundary-instruction span {
+  color: #657268;
+  font-size: .8rem;
+  line-height: 1.4;
+}
+
+.boundary-map {
+  width: 100%;
+  height: clamp(330px, 54vh, 560px);
+  min-height: 330px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 2px solid #cad8c7;
+  background: #dfe8dc;
+  z-index: 1;
+  cursor: crosshair;
+}
+
+.boundary-tools {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr .7fr;
+  gap: 8px;
+}
+
+.boundary-tool {
+  min-height: 48px;
+  border: 1px solid rgba(29,58,42,.13);
+  border-radius: 14px;
+  background: #fffdf8;
+  color: #1d3a2a;
+  font-weight: 850;
+  padding: 10px 12px;
+}
+
+.boundary-tool.gps {
+  background: #dcebf3;
+  color: #255b78;
+}
+
+.boundary-tool.danger {
+  color: #a5493c;
+  background: #f8e8e3;
+}
+
+.boundary-tool:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+
+.boundary-result {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+}
+
+.boundary-result > div {
+  min-height: 76px;
+  padding: 12px 14px;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  border-radius: 16px;
+  background: #f1eee5;
+  border: 1px solid rgba(29,58,42,.09);
+}
+
+.boundary-result.ready > div:last-child {
+  background: #dfeadf;
+}
+
+.boundary-result span {
+  font-size: .7rem;
+  color: #6c786e;
+}
+
+.boundary-result strong {
+  font-size: 1rem;
+}
+
+.boundary-point-number {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: white !important;
+  font-weight: 900 !important;
+  font-size: 10px !important;
+}
+
+.boundary-point-number::before {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .rotation-list article:has(.rotation-photo) {
+    grid-template-columns: 82px auto minmax(0,1fr) !important;
+  }
+
+  .rotation-photo {
+    width: 82px;
+    height: 72px;
+  }
+
+  .rotation-list article:has(.rotation-photo) .fit-score {
+    grid-column: 3;
+  }
+}
+
+@media (max-width: 700px) {
+  .boundary-tools {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .boundary-tool.gps {
+    grid-column: 1 / -1;
+  }
+
+  .boundary-result {
+    grid-template-columns: 1fr;
+  }
+
+  .boundary-map {
+    height: clamp(320px, 48svh, 470px);
+  }
+
+  .entry-photo {
+    width: 112px;
+    height: 100%;
+    min-height: 126px;
+    grid-row: 1 / span 2;
+  }
+
+  .entry-choice {
+    grid-template-columns: 112px minmax(0,1fr) !important;
+  }
+
+  .entry-choice-body {
+    place-items: center start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .simple-status {
+    padding-top: 118px !important;
+  }
+
+  .simple-status-photo {
+    height: 102px;
+  }
+
+  .rotation-list article:has(.rotation-photo) {
+    grid-template-columns: 72px minmax(0,1fr) !important;
+  }
+
+  .rotation-photo {
+    width: 72px;
+    height: 68px;
+  }
+
+  .rotation-list article:has(.rotation-photo) .rotation-rank {
+    display: none;
+  }
+
+  .rotation-list article:has(.rotation-photo) .rotation-main {
+    grid-column: 2;
+  }
+
+  .rotation-list article:has(.rotation-photo) .fit-score {
+    grid-column: 2;
+  }
+
+  .boundary-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .boundary-tool.gps {
+    grid-column: auto;
+  }
+
+  .boundary-map {
+    height: min(52svh, 390px);
+    min-height: 300px;
+  }
+
+  .farmer-row {
+    grid-template-columns: 52px minmax(0,1fr) auto !important;
+  }
+
+  .farmer-thumb {
+    width: 44px;
+    height: 44px;
+  }
+}
