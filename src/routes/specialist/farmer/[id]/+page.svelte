@@ -4,6 +4,7 @@
   import { farmers, fields, areas, rotationPlans } from '$lib/data';
   import { language } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
+  import { appPath } from '$lib/nav';
 
   $: farmer = farmers.find((item) => item.id === $page.params.id);
   $: farmerFields = farmer ? fields.filter((field) => farmer.fieldIds.includes(field.id)) : [];
@@ -14,7 +15,7 @@
 <svelte:head><title>{farmer ? localText(farmer.name,$language) : tr($language,'individualReports')} | AgriFusion BD</title></svelte:head>
 
 <main class="page">
-  <a class="back-link" href="/specialist">← {tr($language,'back')}</a>
+  <a class="back-link" href={appPath('/specialist')}>← {tr($language,'back')}</a>
   {#if farmer}
     <section class="page-title">
       <div>
@@ -61,6 +62,6 @@
       </div>
     </section>
   {:else}
-    <section class="empty-state"><h1>{$language === 'bn' ? 'কৃষক পাওয়া যায়নি' : 'Farmer not found'}</h1><a class="button primary" href="/specialist">{tr($language,'back')}</a></section>
+    <section class="empty-state"><h1>{$language === 'bn' ? 'কৃষক পাওয়া যায়নি' : 'Farmer not found'}</h1><a class="button primary" href={appPath('/specialist')}>{tr($language,'back')}</a></section>
   {/if}
 </main>

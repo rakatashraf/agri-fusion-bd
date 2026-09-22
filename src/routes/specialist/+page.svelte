@@ -3,6 +3,7 @@
   import { areas, fieldsForArea, farmersForArea, fields, areaSummary } from '$lib/data';
   import { language, specialistArea, setSpecialistArea } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
+  import { appPath } from '$lib/nav';
 
   $: scopedFields = fieldsForArea($specialistArea);
   $: scopedFarmers = farmersForArea($specialistArea);
@@ -40,7 +41,7 @@
       {#each scopedFarmers as farmer}
         {@const farmerFields = fields.filter((field) => farmer.fieldIds.includes(field.id))}
         {@const avg = farmerFields.length ? Math.round(farmerFields.reduce((sum, field) => sum + field.health, 0) / farmerFields.length) : 0}
-        <a class="farmer-row" href={"/specialist/farmer/" + farmer.id}>
+        <a class="farmer-row" href={appPath("/specialist/farmer/" + farmer.id)}>
           <div class="farmer-avatar">{localText(farmer.name,$language).slice(0,1)}</div>
           <div class="farmer-main"><strong>{localText(farmer.name,$language)}</strong><span>{farmerFields.length} {tr($language,'field')} • {farmer.phone}</span></div>
           <div class="farmer-health"><strong>{avg}</strong><span>{tr($language,'health')}</span></div>

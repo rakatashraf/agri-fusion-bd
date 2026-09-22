@@ -3,6 +3,7 @@
   import { fields, farmers, rotationPlans, alerts } from '$lib/data';
   import { language, session } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
+  import { appPath } from '$lib/nav';
 
   $: farmerId = $session?.role === 'farmer' ? $session.id : 'farmer-001';
   $: farmer = farmers.find((item) => item.id === farmerId) ?? farmers[0];
@@ -35,7 +36,7 @@
   </section>
 
   <section class="content-section">
-    <div class="section-heading"><div><span class="eyebrow">GPS + field boundary</span><h2>{tr($language,'map')}</h2></div><a href="/map">{tr($language,'allFields')} →</a></div>
+    <div class="section-heading"><div><span class="eyebrow">GPS + field boundary</span><h2>{tr($language,'map')}</h2></div><a href={appPath('/map')}>{tr($language,'allFields')} →</a></div>
     <LiveGpsMap fields={myFields} height="330px" />
   </section>
 

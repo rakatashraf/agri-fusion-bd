@@ -3,12 +3,13 @@
   import { areas } from '$lib/data';
   import { language, session, setSession } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
+  import { appPath } from '$lib/nav';
 
   $: area = areas.find((item) => item.id === $session?.areaId);
 
   function logout() {
     setSession(null);
-    goto('/');
+    goto(appPath('/'));
   }
 </script>
 
@@ -29,6 +30,6 @@
 
     <button class="button danger full" on:click={logout}>{tr($language,'logout')}</button>
   {:else}
-    <section class="empty-state"><h1>{tr($language,'account')}</h1><p>{tr($language,'privacy')}</p><a class="button primary" href="/login">{tr($language,'login')}</a></section>
+    <section class="empty-state"><h1>{tr($language,'account')}</h1><p>{tr($language,'privacy')}</p><a class="button primary" href={appPath('/login')}>{tr($language,'login')}</a></section>
   {/if}
 </main>

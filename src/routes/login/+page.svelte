@@ -4,6 +4,7 @@
   import { language, setSession } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
   import { loginAccount, registerAccount, demoCredentials } from '$lib/auth';
+  import { appPath } from '$lib/nav';
 
   let mode: 'login' | 'register' = 'login';
   let name = '';
@@ -22,7 +23,7 @@
         return;
       }
       setSession(user);
-      goto(user.role === 'specialist' ? '/specialist' : '/farmer');
+      goto(appPath(user.role === 'specialist' ? '/specialist' : '/farmer'));
       return;
     }
 
@@ -33,7 +34,7 @@
 
     const user = registerAccount({ name, identifier, password, role, areaId });
     setSession(user);
-    goto(role === 'specialist' ? '/specialist' : '/farmer');
+    goto(appPath(role === 'specialist' ? '/specialist' : '/farmer'));
   }
 
   function useDemo(item: any) {

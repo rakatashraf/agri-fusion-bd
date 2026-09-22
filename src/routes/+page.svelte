@@ -1,7 +1,9 @@
 <script lang="ts">
   import { language, session } from '$lib/stores/app';
   import { tr } from '$lib/i18n';
-  $: dashboardHref = $session?.role === 'specialist' ? '/specialist' : '/farmer';
+  import { appPath } from '$lib/nav';
+
+  $: dashboardHref = appPath($session?.role === 'specialist' ? '/specialist' : '/farmer');
 </script>
 
 <svelte:head>
@@ -16,8 +18,8 @@
       <h1>{tr($language,'welcomeTitle')}</h1>
       <p>{tr($language,'welcomeBody')}</p>
       <div class="button-row">
-        <a class="button primary" href={$session ? dashboardHref : '/login'}>{tr($language,'openDashboard')}</a>
-        <a class="button secondary" href="/map">{tr($language,'seeLiveMap')}</a>
+        <a class="button primary" href={$session ? dashboardHref : appPath('/login')}>{tr($language,'openDashboard')}</a>
+        <a class="button secondary" href={appPath('/map')}>{tr($language,'seeLiveMap')}</a>
       </div>
     </div>
     <div class="simple-flow">
