@@ -1,0 +1,790 @@
+/* Final cross-device responsiveness layer. Loaded last on purpose. */
+
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  min-width: 0 !important;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+body, button, input, select, textarea {
+  font-size: clamp(14px, .22vw + 13px, 17px);
+}
+
+img, svg, video, canvas, iframe {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+main, section, article, header, nav, div, form, label {
+  min-width: 0;
+}
+
+h1, h2, h3, p, strong, span, small, a, button, label {
+  overflow-wrap: anywhere;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+input, select, textarea, button {
+  max-width: 100%;
+}
+
+input, select, textarea {
+  min-width: 0;
+}
+
+.app-header,
+.page,
+.ag-home,
+.low-literacy-entry {
+  max-width: calc(100vw - 20px);
+}
+
+.page {
+  width: min(1280px, calc(100vw - clamp(20px, 4vw, 56px))) !important;
+}
+
+.page.narrow {
+  width: min(720px, calc(100vw - clamp(20px, 5vw, 48px))) !important;
+}
+
+.ag-home {
+  width: min(1440px, calc(100vw - clamp(12px, 2.5vw, 36px))) !important;
+}
+
+.low-literacy-entry {
+  width: min(1180px, calc(100vw - clamp(20px, 4vw, 52px))) !important;
+}
+
+/* Prevent duplicate emoji navigation added by an older theme layer. */
+.desktop-nav a::before {
+  content: none !important;
+}
+
+/* Fluid typography without gigantic titles on medium screens. */
+h1 {
+  font-size: clamp(2rem, 1.2rem + 3.5vw, 5rem) !important;
+}
+
+h2 {
+  font-size: clamp(1.45rem, 1.05rem + 1.8vw, 2.7rem) !important;
+}
+
+.ag-hero h1 {
+  font-size: clamp(2.8rem, 1.1rem + 6.4vw, 6.8rem) !important;
+}
+
+.ag-editorial h2 {
+  font-size: clamp(2rem, 1.2rem + 3.8vw, 4.7rem) !important;
+}
+
+/* Grids adapt continuously instead of snapping only at one breakpoint. */
+.feature-grid,
+.metric-grid,
+.specialist-metrics,
+.field-card-grid,
+.map-field-list,
+.simple-action-grid,
+.entry-choice-grid,
+.ag-solution-grid {
+  min-width: 0;
+}
+
+.metric-grid,
+.specialist-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)) !important;
+}
+
+.field-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)) !important;
+}
+
+.map-field-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+}
+
+.simple-action-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+}
+
+.entry-choice-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)) !important;
+}
+
+.feature-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)) !important;
+}
+
+.summary-panel {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)) !important;
+}
+
+.summary-panel > div {
+  min-width: 0;
+}
+
+/* Header stays usable from large desktop down through tablets. */
+.app-header {
+  width: min(1280px, calc(100vw - clamp(16px, 3vw, 36px))) !important;
+  padding-inline: clamp(9px, 1.6vw, 18px) !important;
+  gap: clamp(8px, 1.4vw, 18px) !important;
+}
+
+.app-brand {
+  flex: 0 1 auto;
+}
+
+.desktop-nav {
+  min-width: 0;
+}
+
+.desktop-nav a {
+  white-space: nowrap;
+  padding-inline: clamp(9px, 1.1vw, 14px) !important;
+}
+
+.header-actions {
+  flex-shrink: 0;
+}
+
+/* Hero and editorial layouts */
+.ag-hero {
+  min-height: clamp(520px, 72svh, 780px) !important;
+  padding: clamp(22px, 4.5vw, 62px) !important;
+}
+
+.ag-hero-copy {
+  width: min(850px, 100%);
+}
+
+.ag-hero p {
+  max-width: 62ch;
+}
+
+.ag-hero-badge {
+  max-width: min(280px, calc(100% - 40px));
+}
+
+.ag-editorial {
+  width: min(1160px, 100%);
+  grid-template-columns: minmax(160px, .65fr) minmax(0, 1.35fr);
+}
+
+.ag-solution-grid {
+  grid-template-columns: minmax(0, 1.15fr) repeat(2, minmax(0, .85fr));
+}
+
+/* Maps must never create horizontal scroll or absurd heights. */
+.live-map-card,
+.map-canvas,
+.leaflet-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.map-canvas {
+  height: clamp(300px, 50vh, 620px) !important;
+}
+
+.map-toolbar {
+  flex-wrap: wrap;
+}
+
+.map-toolbar > div {
+  min-width: min(220px, 100%);
+  flex: 1 1 220px;
+}
+
+.map-toolbar .button {
+  flex: 0 0 auto;
+}
+
+.map-legend {
+  overflow-wrap: anywhere;
+}
+
+.map-legend .coords {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* Lists, reports and action cards */
+.farmer-row,
+.field-report-head,
+.selected-field-header,
+.field-owner-tools,
+.section-heading,
+.field-picker-label,
+.farmer-simple-head {
+  min-width: 0;
+}
+
+.farmer-main,
+.rotation-main,
+.today-copy,
+.simple-status-copy {
+  min-width: 0;
+}
+
+.rotation-list article {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.action-card,
+.today-board {
+  max-width: 100%;
+}
+
+.form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Large desktop / ultrawide */
+@media (min-width: 1600px) {
+  .page {
+    width: min(1400px, calc(100vw - 96px)) !important;
+  }
+
+  .ag-home {
+    width: min(1520px, calc(100vw - 72px)) !important;
+  }
+
+  .app-header {
+    width: min(1400px, calc(100vw - 80px)) !important;
+  }
+
+  .ag-hero {
+    min-height: min(78svh, 840px) !important;
+  }
+
+  .field-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Laptop and smaller desktop */
+@media (max-width: 1180px) {
+  .profile-chip em {
+    display: none !important;
+  }
+
+  .desktop-nav a span:last-child {
+    font-size: .75rem;
+  }
+
+  .ag-solution-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .ag-solution.primary {
+    grid-column: 1 / -1;
+    min-height: 380px;
+  }
+}
+
+/* Tablet: use bottom navigation too, fixing the old 641–900px dead zone. */
+@media (max-width: 1024px) {
+  body {
+    padding-bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .mobile-nav {
+    position: fixed !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    left: clamp(10px, 3vw, 26px) !important;
+    right: clamp(10px, 3vw, 26px) !important;
+    bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    height: 64px !important;
+    z-index: 2000 !important;
+    border: 1px solid var(--vd-line) !important;
+    border-radius: 22px !important;
+    background: rgba(255, 253, 248, .96) !important;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 16px 44px rgba(22, 44, 31, .15) !important;
+    overflow: hidden;
+  }
+
+  .mobile-nav a {
+    min-width: 0;
+    display: grid !important;
+    place-items: center;
+    align-content: center;
+    gap: 2px;
+    padding: 6px 4px;
+    font-size: clamp(.63rem, 1.4vw, .78rem) !important;
+  }
+
+  .mobile-nav span {
+    font-size: clamp(1.05rem, 2.4vw, 1.3rem) !important;
+  }
+
+  .ag-editorial {
+    grid-template-columns: 1fr !important;
+    gap: 22px !important;
+  }
+
+  .page-title,
+  .specialist-title,
+  .map-title {
+    align-items: flex-start !important;
+  }
+
+  .area-select {
+    width: min(320px, 100%) !important;
+    min-width: 0 !important;
+  }
+
+  .today-board {
+    grid-template-columns: 70px minmax(0, 1fr) !important;
+  }
+
+  .today-board > .voice-guide {
+    grid-column: 1 / -1;
+    width: max-content;
+  }
+}
+
+/* Portrait tablets and large phones */
+@media (max-width: 768px) {
+  .app-header {
+    top: 8px !important;
+    margin-top: 8px !important;
+    height: 56px !important;
+  }
+
+  .app-brand small,
+  .profile-chip {
+    display: none !important;
+  }
+
+  .header-actions {
+    margin-left: auto;
+  }
+
+  .page,
+  .page.narrow {
+    width: calc(100vw - 22px) !important;
+    padding-top: 24px !important;
+  }
+
+  .ag-home {
+    width: calc(100vw - 14px) !important;
+    padding-top: 10px !important;
+  }
+
+  .ag-hero {
+    min-height: clamp(560px, 76svh, 720px) !important;
+    border-radius: 24px !important;
+  }
+
+  .ag-hero-copy {
+    padding-bottom: 110px;
+  }
+
+  .ag-hero-badge {
+    left: 20px !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    width: auto !important;
+  }
+
+  .ag-hero-actions,
+  .button-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100%;
+  }
+
+  .ag-hero-actions .button,
+  .ag-hero-actions .voice-guide,
+  .button-row .button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .page-title,
+  .farmer-simple-head,
+  .selected-field-header {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .page-title {
+    padding: 20px !important;
+  }
+
+  .health-pill {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .farmer-simple-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    width: 100%;
+  }
+
+  .farmer-simple-actions .button,
+  .farmer-simple-actions .voice-guide {
+    width: 100% !important;
+    justify-content: center;
+  }
+
+  .field-picker-label,
+  .section-heading {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+  }
+
+  .simple-action-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .entry-choice-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .entry-choice {
+    grid-template-columns: 72px minmax(0, 1fr) !important;
+    min-height: 126px !important;
+    place-items: center start !important;
+    text-align: left !important;
+  }
+
+  .entry-choice .big-icon {
+    grid-row: 1 / 3;
+  }
+
+  .ag-solution-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .ag-solution.primary {
+    grid-column: auto !important;
+  }
+
+  .form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .wizard-head,
+  .wizard-body {
+    padding: 20px !important;
+  }
+
+  .wizard-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .wizard-actions > * {
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .summary-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  .summary-panel > div {
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--vd-line);
+  }
+
+  .summary-panel > div:last-child {
+    border-bottom: 0;
+  }
+
+  .farmer-row {
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+  }
+
+  .farmer-health {
+    display: none !important;
+  }
+
+  .field-report-head {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .map-toolbar .button {
+    width: 100%;
+  }
+
+  .map-canvas {
+    height: clamp(300px, 48svh, 460px) !important;
+  }
+
+  .map-legend .coords {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+}
+
+/* Phones */
+@media (max-width: 520px) {
+  :root {
+    --phone-pad: 12px;
+  }
+
+  body {
+    font-size: 15px;
+  }
+
+  .app-header {
+    width: calc(100vw - 16px) !important;
+    border-radius: 18px !important;
+    padding-inline: 8px !important;
+  }
+
+  .brand-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .app-brand strong {
+    font-size: .84rem !important;
+  }
+
+  .language-switch button {
+    padding: 6px 7px !important;
+    font-size: .7rem !important;
+  }
+
+  .page,
+  .page.narrow {
+    width: calc(100vw - 16px) !important;
+  }
+
+  .ag-hero {
+    min-height: 620px !important;
+    padding: 22px 16px !important;
+  }
+
+  .ag-hero h1 {
+    font-size: clamp(2.7rem, 14vw, 4.6rem) !important;
+  }
+
+  .ag-editorial h2 {
+    font-size: clamp(2rem, 10vw, 3.4rem) !important;
+  }
+
+  .farmer-simple-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .today-board {
+    grid-template-columns: 1fr !important;
+    padding: 18px !important;
+  }
+
+  .today-board .today-icon {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .today-board > .voice-guide {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .simple-status {
+    grid-template-columns: 54px minmax(0, 1fr) !important;
+    padding: 16px !important;
+    min-height: 0 !important;
+  }
+
+  .simple-status-icon {
+    width: 54px !important;
+    height: 54px !important;
+  }
+
+  .metric-grid,
+  .specialist-metrics,
+  .field-card-grid,
+  .map-field-list {
+    grid-template-columns: 1fr !important;
+  }
+
+  .rotation-list article {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+  }
+
+  .fit-score {
+    grid-column: 2 !important;
+    text-align: left !important;
+    display: flex !important;
+    gap: 5px;
+    align-items: baseline;
+  }
+
+  .wizard-steps {
+    gap: 6px !important;
+  }
+
+  .wizard-step {
+    justify-content: center !important;
+    min-height: 56px !important;
+  }
+
+  .wizard-step strong {
+    display: none !important;
+  }
+
+  .wizard-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .role-choice-row,
+  .demo-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-card {
+    align-items: flex-start !important;
+  }
+
+  .info-list > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .map-canvas {
+    height: clamp(280px, 45svh, 400px) !important;
+  }
+}
+
+/* Very small phones, foldable cover screens, embedded webviews. */
+@media (max-width: 360px) {
+  .app-header {
+    width: calc(100vw - 10px) !important;
+  }
+
+  .app-brand > span:last-child {
+    display: none !important;
+  }
+
+  .page,
+  .page.narrow {
+    width: calc(100vw - 12px) !important;
+  }
+
+  .ag-home {
+    width: calc(100vw - 8px) !important;
+  }
+
+  .ag-hero {
+    border-radius: 18px !important;
+    padding-inline: 14px !important;
+  }
+
+  .ag-hero h1 {
+    font-size: clamp(2.4rem, 15vw, 3.4rem) !important;
+  }
+
+  .button,
+  .voice-guide {
+    padding-inline: 12px !important;
+  }
+
+  .mobile-nav {
+    left: 6px !important;
+    right: 6px !important;
+    bottom: calc(6px + env(safe-area-inset-bottom)) !important;
+    border-radius: 18px !important;
+  }
+
+  .mobile-nav a {
+    font-size: .6rem !important;
+  }
+
+  .field-select-card,
+  .field-add-card,
+  .simple-status,
+  .action-card,
+  .auth-card,
+  .wizard-shell,
+  .live-map-card {
+    border-radius: 18px !important;
+  }
+}
+
+/* Short landscape phones/tablets: avoid giant vertical heroes/maps. */
+@media (orientation: landscape) and (max-height: 600px) {
+  body {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .ag-hero {
+    min-height: 430px !important;
+    height: auto !important;
+  }
+
+  .ag-hero-copy {
+    padding-bottom: 70px !important;
+  }
+
+  .ag-hero h1 {
+    font-size: clamp(2.5rem, 7vw, 4.4rem) !important;
+  }
+
+  .map-canvas {
+    height: min(62svh, 360px) !important;
+  }
+
+  .today-board {
+    padding-block: 16px !important;
+  }
+
+  .mobile-nav {
+    height: 58px !important;
+  }
+}
+
+/* Safe-area support for notched phones. */
+@supports (padding: max(0px)) {
+  .app-header {
+    padding-left: max(9px, env(safe-area-inset-left)) !important;
+    padding-right: max(9px, env(safe-area-inset-right)) !important;
+  }
+
+  .mobile-nav {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Users who request less motion should not get flying cards/buttons. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

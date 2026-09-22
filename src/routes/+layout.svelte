@@ -3,6 +3,7 @@
   import '../field-management.css';
   import '../agrovia-theme.css';
   import '../verda-theme.css';
+  import '../responsive-final.css';
   import AppHeader from '$lib/components/AppHeader.svelte';
   const { children } = $props();
 </script>
