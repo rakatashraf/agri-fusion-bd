@@ -1,0 +1,49 @@
+.farmer-title { align-items:flex-start; }
+.field-switch-section { margin-top:10px; }
+.field-card-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.field-select-card,.field-add-card {
+  min-height:138px; border:1px solid var(--line); border-radius:14px; background:white; padding:15px;
+  text-align:left; color:var(--ink); display:grid; gap:7px; align-content:start;
+}
+.field-select-card { width:100%; }
+.field-select-card:hover,.field-add-card:hover { border-color:#a9c8b2; background:#fbfdfb; }
+.field-select-card.active { border-color:#5b9a70; box-shadow:0 0 0 3px rgba(35,133,77,.08); background:#fbfefb; }
+.field-card-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.field-index { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--green-soft); color:var(--green); font-size:.76rem; font-weight:900; }
+.field-select-card > strong { font-size:1rem; }
+.field-select-card > span:not(.risk-badge) { color:var(--muted); font-size:.78rem; }
+.field-card-health { margin-top:auto; padding-top:5px; border-top:1px solid #edf0ed; display:flex; align-items:center; justify-content:space-between; }
+.field-card-health span { color:var(--muted); font-size:.7rem; }
+.field-card-health b { color:var(--green); font-size:1rem; }
+.field-add-card { place-items:center; align-content:center; text-align:center; border-style:dashed; color:var(--green); }
+.field-add-card > span { width:36px; height:36px; display:grid; place-items:center; border-radius:50%; background:var(--green-soft); font-size:1.3rem; }
+.selected-field-header { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; margin:28px 0 12px; }
+.selected-field-header h2 { margin-bottom:4px; }
+.selected-field-header p { margin:0; font-size:.84rem; }
+.field-owner-tools { margin-top:12px; display:flex; justify-content:space-between; gap:16px; align-items:center; padding:13px 14px; border:1px solid #ead9d5; background:#fffafa; border-radius:12px; }
+.field-owner-tools > div { display:grid; gap:3px; }
+.field-owner-tools small { font-size:.72rem; }
+.field-empty { padding:54px 18px; border:1px dashed #cfd9d2; background:white; border-radius:16px; }
+.empty-icon { font-size:2rem; margin-bottom:10px; }
+.add-field-card h1 { font-size:clamp(1.8rem,5vw,2.45rem); }
+.form-grid-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.field-location-box { display:grid; gap:12px; padding:14px; border:1px solid var(--line); background:#f8faf8; border-radius:12px; }
+.field-location-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.field-location-head > div { display:grid; gap:3px; }
+.field-location-head small { font-size:.72rem; }
+.field-note { padding:11px 12px; border-radius:10px; background:#fff8e7; color:#7b6224; font-size:.76rem; line-height:1.5; }
+.success-text { color:var(--green); font-weight:800; }
+
+@media (max-width:900px) {
+  .field-card-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+@media (max-width:640px) {
+  .farmer-title,.selected-field-header { display:grid; grid-template-columns:1fr; align-items:start; }
+  .farmer-title .button { width:100%; }
+  .field-card-grid { grid-template-columns:1fr; }
+  .field-select-card,.field-add-card { min-height:118px; }
+  .field-owner-tools,.field-location-head { align-items:stretch; display:grid; grid-template-columns:1fr; }
+  .field-owner-tools .button,.field-location-head .button { width:100%; }
+  .form-grid-2 { grid-template-columns:1fr; }
+}

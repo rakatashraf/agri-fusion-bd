@@ -1,15 +1,18 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import LiveGpsMap from '$lib/components/LiveGpsMap.svelte';
-  import { areas, fields, fieldsForArea, farmers } from '$lib/data';
+  import { areas, fields, fieldsForArea } from '$lib/data';
   import { language, session, specialistArea, setSpecialistArea } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
+  import { userFields, loadUserFields } from '$lib/fields';
 
-  $: farmer = $session?.role === 'farmer' ? farmers.find((item) => item.id === $session?.id) : null;
-  $: visibleFields = farmer
-    ? fields.filter((field) => farmer.fieldIds.includes(field.id))
+  onMount(loadUserFields);
+
+  $: visibleFields = $session?.role === 'farmer'
+    ? [...fields.filter((field) => field.farmerId === $session.id), ...$userFields.filter((field) => field.farmerId === $session.id)]
     : $session?.role === 'specialist'
-      ? fieldsForArea($specialistArea)
-      : fields;
+      ? [...fieldsForArea($specialistArea), ...$userFields.filter((field) => field.areaId === $specialistArea)]
+      : [...fields, ...$userFields];
 </script>
 
 <svelte:head><title>{tr($language,'map')} | AgriFusion BD</title></svelte:head>
@@ -29,13 +32,15 @@
   <LiveGpsMap fields={visibleFields} height="min(68vh, 620px)" />
 
   <section class="content-section">
-    <div class="section-heading"><div><h2>{tr($language,'allFields')}</h2></div></div>
+    <div class="section-heading">
+      <div><h2>{tr($language,'allFields')}</h2><p>{visibleFields.length} {$language === 'bn' ? 'টি নিবন্ধিত জমি' : 'registered fields'}</p></div>
+    </div>
     <div class="map-field-list">
       {#each visibleFields as field}
         <article>
           <span class="status-dot {field.risk}"></span>
           <div><strong>{localText(field.name,$language)}</strong><small>{localText(field.crop,$language)} • {field.areaHa} ha</small></div>
-          <div class="mini-health">{field.health}</div>
+          <div class="mini-health">{field.health || '—'}</div>
         </article>
       {/each}
     </div>
