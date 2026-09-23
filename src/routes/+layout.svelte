@@ -9,8 +9,10 @@
   import '../full-bleed-cards.css';
   import '../logo.css';
   import AppHeader from '$lib/components/AppHeader.svelte';
+  import LoadingScreen from '$lib/components/LoadingScreen.svelte';
   const { children } = $props();
 </script>
 
+<LoadingScreen />
 <AppHeader />
 {@render children()}
