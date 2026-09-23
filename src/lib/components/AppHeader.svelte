@@ -10,13 +10,19 @@
 
 <header class="app-header">
   <a class="app-brand" href={appPath('/')} aria-label="AgriFusion Bangladesh">
-    <img
-      class="brand-logo"
-      src={appPath('/agrifusion-logo-visible.webp?v=15')}
-      alt="AgriFusion Bangladesh"
-      width="260"
-      height="64"
-    />
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 64 64" role="img">
+        <circle cx="32" cy="32" r="30" class="brand-mark-bg" />
+        <path class="brand-leaf brand-leaf-large"
+          d="M29 48c2-15 11-28 28-34 0 17-8 31-24 38 5-11 11-20 18-27-10 5-17 13-22 23Z" />
+        <path class="brand-leaf brand-leaf-small"
+          d="M25 42C15 37 10 28 10 18c11 3 18 11 20 23-4-7-8-12-13-15 4 5 7 10 8 16Z" />
+      </svg>
+    </span>
+    <span class="brand-wordmark">
+      <strong>AgriFusion</strong>
+      <small>BANGLADESH</small>
+    </span>
   </a>
 
   <nav class="desktop-nav">
