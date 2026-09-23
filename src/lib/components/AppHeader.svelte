@@ -12,10 +12,10 @@
   <a class="app-brand" href={appPath('/')} aria-label="AgriFusion Bangladesh">
     <img
       class="brand-logo"
-      src={appPath('/agrifusion-logo-exact.webp')}
+      src={appPath('/agrifusion-logo-visible.webp?v=15')}
       alt="AgriFusion Bangladesh"
-      width="520"
-      height="127"
+      width="260"
+      height="64"
     />
   </a>
 

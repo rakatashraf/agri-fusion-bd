@@ -1,58 +1,8 @@
-.app-header{
-  display:grid!important;
-  grid-template-columns:minmax(220px,280px) minmax(0,1fr) auto!important;
-  align-items:center!important;
-  width:calc(100vw - 14px)!important;
-  max-width:none!important;
-  margin:7px!important;
-  padding:0 14px!important;
-  column-gap:18px!important;
-  box-sizing:border-box!important;
-}
-.app-brand{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  justify-self:start!important;
-  width:260px!important;
-  min-width:220px!important;
-  height:54px!important;
-  padding:0!important;
-  margin:0!important;
-  background:none!important;
-}
-.brand-logo{
-  display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
-  position:static!important;
-  width:100%!important;
-  height:auto!important;
-  max-width:260px!important;
-  max-height:52px!important;
-  object-fit:contain!important;
-  object-position:left center!important;
-  filter:none!important;
-  transform:none!important;
-}
-.desktop-nav{justify-self:center!important}
-.header-actions{justify-self:end!important}
-@media(max-width:1180px){
-  .app-header{grid-template-columns:minmax(180px,220px) minmax(0,1fr) auto!important}
-  .app-brand{width:205px!important;min-width:180px!important;height:48px!important}
-  .brand-logo{max-width:205px!important;max-height:44px!important}
-}
-@media(max-width:1024px){
-  .app-header{grid-template-columns:minmax(155px,1fr) auto!important}
-  .app-brand{width:190px!important;min-width:155px!important;height:46px!important}
-  .brand-logo{max-width:190px!important;max-height:42px!important}
-}
-@media(max-width:640px){
-  .app-header{width:calc(100vw - 10px)!important;margin:5px!important;padding:0 9px!important;grid-template-columns:minmax(125px,1fr) auto!important}
-  .app-brand{width:165px!important;min-width:125px!important;height:42px!important}
-  .brand-logo{max-width:165px!important;max-height:38px!important}
-}
-@media(max-width:390px){
-  .app-brand{width:118px!important;min-width:118px!important;height:38px!important}
-  .brand-logo{max-width:118px!important;max-height:34px!important}
-}
+.app-header{display:grid!important;grid-template-columns:minmax(220px,280px) minmax(0,1fr) auto!important;align-items:center!important;width:calc(100vw - 14px)!important;max-width:none!important;margin:7px!important;padding:0 14px!important;column-gap:18px!important;box-sizing:border-box!important}
+.app-brand{display:flex!important;align-items:center!important;justify-content:flex-start!important;justify-self:start!important;width:260px!important;min-width:220px!important;height:54px!important;padding:0!important;margin:0!important;background:none!important}
+.brand-logo{display:block!important;visibility:visible!important;opacity:1!important;position:static!important;width:260px!important;height:64px!important;max-width:260px!important;max-height:64px!important;object-fit:contain!important;object-position:left center!important;filter:none!important;transform:none!important}
+.desktop-nav{justify-self:center!important}.header-actions{justify-self:end!important}
+@media(max-width:1180px){.app-header{grid-template-columns:minmax(180px,220px) minmax(0,1fr) auto!important}.app-brand{width:205px!important;min-width:180px!important;height:48px!important}.brand-logo{width:205px!important;height:auto!important;max-width:205px!important}}
+@media(max-width:1024px){.app-header{grid-template-columns:minmax(155px,1fr) auto!important}.app-brand{width:190px!important;min-width:155px!important;height:46px!important}.brand-logo{width:190px!important;height:auto!important;max-width:190px!important}}
+@media(max-width:640px){.app-header{width:calc(100vw - 10px)!important;margin:5px!important;padding:0 9px!important;grid-template-columns:minmax(125px,1fr) auto!important}.app-brand{width:165px!important;min-width:125px!important;height:42px!important}.brand-logo{width:165px!important;height:auto!important;max-width:165px!important}}
+@media(max-width:390px){.app-brand{width:118px!important;min-width:118px!important;height:38px!important}.brand-logo{width:118px!important;height:auto!important;max-width:118px!important}}
