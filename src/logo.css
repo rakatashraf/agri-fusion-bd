@@ -1,0 +1,44 @@
+.app-brand {
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.brand-logo {
+  display: block;
+  width: clamp(138px, 13.5vw, 188px);
+  height: auto;
+  max-height: 46px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+@media (max-width: 1180px) {
+  .brand-logo {
+    width: clamp(128px, 15vw, 160px);
+    max-height: 42px;
+  }
+}
+
+@media (max-width: 768px) {
+  .brand-logo {
+    width: clamp(122px, 28vw, 154px);
+    max-height: 38px;
+  }
+}
+
+@media (max-width: 430px) {
+  .brand-logo {
+    width: 118px;
+    max-height: 34px;
+  }
+}
+
+@media (max-width: 350px) {
+  .brand-logo {
+    width: 104px;
+    max-height: 30px;
+  }
+}

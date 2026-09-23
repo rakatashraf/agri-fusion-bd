@@ -9,9 +9,12 @@
 </script>
 
 <header class="app-header">
-  <a class="app-brand" href={appPath('/')}>
-    <span class="brand-icon">A</span>
-    <span><strong>AgriFusion</strong><small>Bangladesh</small></span>
+  <a class="app-brand" href={appPath('/')} aria-label="AgriFusion Bangladesh">
+    <img
+      class="brand-logo"
+      src={appPath('/agrifusion-logo.webp')}
+      alt="AgriFusion Bangladesh"
+    />
   </a>
 
   <nav class="desktop-nav">

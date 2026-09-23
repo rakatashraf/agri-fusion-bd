@@ -7,6 +7,7 @@
   import '../photo-boundary.css';
   import '../photo-card-extra.css';
   import '../full-bleed-cards.css';
+  import '../logo.css';
   import AppHeader from '$lib/components/AppHeader.svelte';
   const { children } = $props();
 </script>
