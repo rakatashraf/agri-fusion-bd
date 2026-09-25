@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { language } from '$lib/stores/app';
   import { tr, localText } from '$lib/i18n';
+  import LocationSearch from '$lib/components/LocationSearch.svelte';
   import {
     NASA_LAYERS,
     createNasaBlueMarble,
@@ -30,10 +31,12 @@
   let nasaLayer: any;
   let labelsLayer: any;
   let blueMarble: any;
+  let searchMarker: any;
   let activeLayer: NasaLayerId = 'viirs21';
   let imageryDate = isoDateOffset(1);
-  let labelsVisible = true;
+  let labelsVisible = false;
   let layerLoading = false;
+  let tileErrors = 0;
 
   $: preset = NASA_LAYERS[activeLayer];
 
@@ -82,17 +85,47 @@
     );
   }
 
+  function setBackgroundNeeded(needed: boolean) {
+    if (!map || !L) return;
+
+    if (needed && !blueMarble) {
+      blueMarble = createNasaBlueMarble(L).addTo(map);
+      if (nasaLayer) nasaLayer.bringToFront();
+    }
+
+    if (!needed && blueMarble) {
+      map.removeLayer(blueMarble);
+      blueMarble = null;
+    }
+  }
+
   function loadImagery() {
     if (!map || !L) return;
+
     if (nasaLayer) map.removeLayer(nasaLayer);
     layerLoading = true;
+    tileErrors = 0;
+
     const p = NASA_LAYERS[activeLayer];
+    setBackgroundNeeded(p.transparent);
+
     nasaLayer = createNasaLayer(L, p, imageryDate, p.transparent ? .95 : 1);
-    nasaLayer.on('load', () => layerLoading = false);
-    nasaLayer.on('tileerror', () => layerLoading = false);
+    nasaLayer.on('load', () => {
+      layerLoading = false;
+      polygonEntries.forEach(({layer}) => layer.bringToFront());
+      if (searchMarker) searchMarker.bringToFront();
+      if (livePoint) livePoint.bringToFront();
+    });
+    nasaLayer.on('tileerror', () => {
+      tileErrors += 1;
+      layerLoading = false;
+      if (tileErrors >= 3) setBackgroundNeeded(true);
+    });
+
     nasaLayer.addTo(map);
     if (labelsVisible && labelsLayer) labelsLayer.bringToFront();
     polygonEntries.forEach(({layer}) => layer.bringToFront());
+    if (searchMarker) searchMarker.bringToFront();
     if (livePoint) livePoint.bringToFront();
   }
 
@@ -114,9 +147,36 @@
 
   function toggleLabels() {
     labelsVisible = !labelsVisible;
-    if (!map || !labelsLayer) return;
-    if (labelsVisible) labelsLayer.addTo(map).bringToFront();
-    else map.removeLayer(labelsLayer);
+    if (!map || !L) return;
+
+    if (labelsVisible) {
+      if (!labelsLayer) labelsLayer = createNasaLabelsLayer(L);
+      labelsLayer.addTo(map).bringToFront();
+      polygonEntries.forEach(({layer}) => layer.bringToFront());
+      if (searchMarker) searchMarker.bringToFront();
+      if (livePoint) livePoint.bringToFront();
+    } else if (labelsLayer && map.hasLayer(labelsLayer)) {
+      map.removeLayer(labelsLayer);
+    }
+  }
+
+  function handleSearchSelect(event: CustomEvent) {
+    const { lat, lng, label } = event.detail;
+    if (!map || !L) return;
+
+    const point: [number, number] = [lat, lng];
+    map.flyTo(point, 16, { duration: .65 });
+
+    if (searchMarker) {
+      searchMarker.setLatLng(point).setTooltipContent(label || '');
+    } else {
+      searchMarker = L.marker(point, {
+        title: label || ($language === 'bn' ? 'খোঁজা লোকেশন' : 'Searched location')
+      }).addTo(map);
+      searchMarker.bindTooltip(label || '', { direction: 'top', offset: [0, -8] });
+    }
+
+    if (label) searchMarker.openTooltip();
   }
 
   onMount(async () => {
@@ -129,10 +189,7 @@
       zoomDelta: .5
     }).setView([24.405, 88.61], 12);
 
-    blueMarble = createNasaBlueMarble(L).addTo(map);
-    labelsLayer = createNasaLabelsLayer(L);
     loadImagery();
-    if (labelsVisible) labelsLayer.addTo(map);
 
     const bounds: any[] = [];
 
@@ -169,7 +226,7 @@
     });
 
     if (bounds.length) map.fitBounds(bounds, { padding: [32,32], maxZoom: 17 });
-    if (showLive) startGps();
+    if (showLive) window.setTimeout(startGps, 650);
 
     return () => {
       unsubscribe();
@@ -202,6 +259,13 @@
       {/if}
       <button class="button small secondary" on:click={toggleLabels}>{labelsVisible ? 'Aa ✓' : 'Aa'}</button>
     </div>
+  </div>
+
+  <div class="map-search-row">
+    <LocationSearch language={$language} compact on:select={handleSearchSelect} />
+    <small>{$language === 'bn'
+      ? 'জমির কাছের গ্রাম/রাস্তা লিখুন, তারপর ম্যাপে সীমানা দেখুন।'
+      : 'Search a nearby village or road, then inspect the field on the map.'}</small>
   </div>
 
   <div class="nasa-layer-toolbar compact">

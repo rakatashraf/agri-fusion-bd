@@ -9,9 +9,11 @@ export type NasaLayerPreset = {
   maxNativeZoom: number;
   format: 'image/jpeg' | 'image/png';
   transparent: boolean;
+  fastTiles?: boolean;
 };
 
 export const NASA_WMS = 'https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi';
+export const NASA_WMTS = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best';
 
 export const NASA_LAYERS: Record<NasaLayerId, NasaLayerPreset> = {
   viirs21: {
@@ -22,7 +24,8 @@ export const NASA_LAYERS: Record<NasaLayerId, NasaLayerPreset> = {
     latency: 'Near-real-time',
     maxNativeZoom: 9,
     format: 'image/jpeg',
-    transparent: false
+    transparent: false,
+    fastTiles: true
   },
   viirs20: {
     id: 'viirs20',
@@ -32,7 +35,8 @@ export const NASA_LAYERS: Record<NasaLayerId, NasaLayerPreset> = {
     latency: 'Near-real-time',
     maxNativeZoom: 9,
     format: 'image/jpeg',
-    transparent: false
+    transparent: false,
+    fastTiles: true
   },
   modis: {
     id: 'modis',
@@ -42,7 +46,8 @@ export const NASA_LAYERS: Record<NasaLayerId, NasaLayerPreset> = {
     latency: 'Near-real-time',
     maxNativeZoom: 9,
     format: 'image/jpeg',
-    transparent: false
+    transparent: false,
+    fastTiles: true
   },
   hls: {
     id: 'hls',
@@ -52,7 +57,8 @@ export const NASA_LAYERS: Record<NasaLayerId, NasaLayerPreset> = {
     latency: 'Usually days',
     maxNativeZoom: 12,
     format: 'image/png',
-    transparent: true
+    transparent: true,
+    fastTiles: false
   }
 };
 
@@ -68,6 +74,26 @@ export function clampDateToToday(value: string) {
 }
 
 export function createNasaLayer(L: any, preset: NasaLayerPreset, date: string, opacity = 1) {
+  if (preset.fastTiles) {
+    const extension = preset.format === 'image/png' ? 'png' : 'jpeg';
+    const url =
+      NASA_WMTS + '/' + preset.layer + '/default/' + date +
+      '/GoogleMapsCompatible_Level' + preset.maxNativeZoom +
+      '/{z}/{y}/{x}.' + extension;
+
+    return L.tileLayer(url, {
+      tileSize: 256,
+      maxZoom: 20,
+      maxNativeZoom: preset.maxNativeZoom,
+      updateWhenIdle: true,
+      updateWhenZooming: false,
+      keepBuffer: 2,
+      crossOrigin: true,
+      opacity,
+      attribution: 'NASA EOSDIS GIBS'
+    });
+  }
+
   return L.tileLayer.wms(NASA_WMS, {
     layers: preset.layer,
     styles: '',
@@ -75,14 +101,13 @@ export function createNasaLayer(L: any, preset: NasaLayerPreset, date: string, o
     transparent: preset.transparent,
     version: '1.1.1',
     time: date,
-    tileSize: 512,
-    zoomOffset: -1,
-    detectRetina: true,
+    tileSize: 256,
+    detectRetina: false,
     maxZoom: 20,
     maxNativeZoom: preset.maxNativeZoom,
-    updateWhenIdle: false,
+    updateWhenIdle: true,
     updateWhenZooming: false,
-    keepBuffer: 4,
+    keepBuffer: 1,
     crossOrigin: true,
     opacity,
     attribution: 'NASA EOSDIS GIBS'
@@ -96,11 +121,13 @@ export function createNasaLabelsLayer(L: any) {
     format: 'image/png',
     transparent: true,
     version: '1.1.1',
-    tileSize: 512,
-    zoomOffset: -1,
-    detectRetina: true,
+    tileSize: 256,
+    detectRetina: false,
     maxZoom: 20,
     maxNativeZoom: 14,
+    updateWhenIdle: true,
+    updateWhenZooming: false,
+    keepBuffer: 1,
     crossOrigin: true,
     opacity: .92,
     attribution: 'NASA GIBS reference labels'
@@ -108,17 +135,17 @@ export function createNasaLabelsLayer(L: any) {
 }
 
 export function createNasaBlueMarble(L: any) {
-  return L.tileLayer.wms(NASA_WMS, {
-    layers: 'BlueMarble_ShadedRelief_Bathymetry',
-    styles: '',
-    format: 'image/jpeg',
-    transparent: false,
-    version: '1.1.1',
-    tileSize: 512,
-    zoomOffset: -1,
-    detectRetina: true,
+  const url =
+    NASA_WMTS +
+    '/BlueMarble_ShadedRelief_Bathymetry/default/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg';
+
+  return L.tileLayer(url, {
+    tileSize: 256,
     maxZoom: 20,
     maxNativeZoom: 8,
+    updateWhenIdle: true,
+    updateWhenZooming: false,
+    keepBuffer: 1,
     crossOrigin: true,
     attribution: 'NASA EOSDIS GIBS'
   });

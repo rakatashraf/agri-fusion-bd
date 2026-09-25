@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
+  import LocationSearch from '$lib/components/LocationSearch.svelte';
   import {
     NASA_LAYERS,
     createNasaBlueMarble,
@@ -26,10 +27,11 @@
   let previewLine: any;
   let pointLayers: any[] = [];
   let gpsMarker: any;
+  let searchMarker: any;
   let gpsState: 'idle' | 'loading' | 'ready' | 'error' = 'idle';
   let activeLayer: NasaLayerId = 'viirs21';
   let imageryDate = isoDateOffset(1);
-  let labelsVisible = true;
+  let labelsVisible = false;
   let drawing = true;
   let layerLoading = false;
   let tileErrors = 0;
@@ -236,6 +238,20 @@
     );
   }
 
+  function setBackgroundNeeded(needed: boolean) {
+    if (!map || !L) return;
+
+    if (needed && !blueMarble) {
+      blueMarble = createNasaBlueMarble(L).addTo(map);
+      if (nasaLayer) nasaLayer.bringToFront();
+    }
+
+    if (!needed && blueMarble) {
+      map.removeLayer(blueMarble);
+      blueMarble = null;
+    }
+  }
+
   function loadImagery() {
     if (!map || !L) return;
 
@@ -244,13 +260,21 @@
     tileErrors = 0;
 
     const selectedPreset = NASA_LAYERS[activeLayer];
+    setBackgroundNeeded(selectedPreset.transparent);
+
     nasaLayer = createNasaLayer(L, selectedPreset, imageryDate, selectedPreset.transparent ? .96 : 1);
 
     nasaLayer.on('loading', () => layerLoading = true);
-    nasaLayer.on('load', () => layerLoading = false);
+    nasaLayer.on('load', () => {
+      layerLoading = false;
+      redraw();
+      if (searchMarker) searchMarker.bringToFront();
+      if (gpsMarker) gpsMarker.bringToFront();
+    });
     nasaLayer.on('tileerror', () => {
       tileErrors += 1;
       layerLoading = false;
+      if (tileErrors >= 3) setBackgroundNeeded(true);
     });
 
     nasaLayer.addTo(map);
@@ -276,9 +300,36 @@
 
   function toggleLabels() {
     labelsVisible = !labelsVisible;
-    if (!map || !labelsLayer) return;
-    if (labelsVisible) labelsLayer.addTo(map).bringToFront();
-    else map.removeLayer(labelsLayer);
+    if (!map || !L) return;
+
+    if (labelsVisible) {
+      if (!labelsLayer) labelsLayer = createNasaLabelsLayer(L);
+      labelsLayer.addTo(map).bringToFront();
+      redraw();
+      if (searchMarker) searchMarker.bringToFront();
+      if (gpsMarker) gpsMarker.bringToFront();
+    } else if (labelsLayer && map.hasLayer(labelsLayer)) {
+      map.removeLayer(labelsLayer);
+    }
+  }
+
+  function handleSearchSelect(event: CustomEvent) {
+    const { lat, lng, label } = event.detail;
+    if (!map || !L) return;
+
+    const point: [number, number] = [lat, lng];
+    map.flyTo(point, 18, { duration: .65 });
+
+    if (searchMarker) {
+      searchMarker.setLatLng(point).setTooltipContent(label || '');
+    } else {
+      searchMarker = L.marker(point, {
+        title: label || (language === 'bn' ? 'খোঁজা লোকেশন' : 'Searched location')
+      }).addTo(map);
+      searchMarker.bindTooltip(label || '', { direction: 'top', offset: [0, -8] });
+    }
+
+    if (label) searchMarker.openTooltip();
   }
 
   onMount(async () => {
@@ -294,10 +345,7 @@
       doubleClickZoom: false
     }).setView(initialCenter, 17);
 
-    blueMarble = createNasaBlueMarble(L).addTo(map);
-    labelsLayer = createNasaLabelsLayer(L);
     loadImagery();
-    if (labelsVisible) labelsLayer.addTo(map);
 
     map.on('click', (event: any) => addPoint(event.latlng.lat, event.latlng.lng));
     map.on('mousemove', (event: any) => {
@@ -347,6 +395,13 @@
         ? 'প্রতিটি কোণা বা বাঁকে ট্যাপ করুন। পয়েন্ট টেনে ঠিক করুন। ডাবল ট্যাপ/ক্লিকে পয়েন্ট মুছুন।'
         : 'Tap every corner or bend. Drag points to refine. Double-click a point to remove it.'}</span>
     </div>
+  </div>
+
+  <div class="map-search-row field-search-row">
+    <LocationSearch language={language} on:select={handleSearchSelect} />
+    <small>{language === 'bn'
+      ? 'জমির নাম না থাকলে কাছের গ্রাম, বাজার, রাস্তা বা GPS কো-অর্ডিনেট লিখুন।'
+      : 'If the field has no map name, search a nearby village, market, road or GPS coordinates.'}</small>
   </div>
 
   <div class="nasa-layer-toolbar">

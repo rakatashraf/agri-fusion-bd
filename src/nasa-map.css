@@ -432,3 +432,130 @@
 @media(prefers-reduced-motion:reduce) {
   .pulse-dot { animation:none; }
 }
+
+
+/* Faster, calmer map layout */
+.nasa-live-map {
+  width:min(100%,1060px);
+  margin-inline:auto;
+}
+
+.map-search-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:12px 14px;
+  background:#f8f7f0;
+  border-top:1px solid rgba(13,38,24,.07);
+  border-bottom:1px solid rgba(13,38,24,.07);
+}
+
+.map-search-row > small {
+  max-width:300px;
+  color:#68736b;
+  font-size:.7rem;
+  line-height:1.4;
+}
+
+.field-search-row {
+  margin-top:10px;
+  padding:10px 0;
+  background:transparent;
+  border:0;
+}
+
+.nasa-live-map .map-canvas-wrap {
+  width:100%;
+  max-width:100%;
+  border-radius:20px;
+}
+
+.nasa-live-map .map-canvas {
+  min-height:420px;
+  max-height:620px;
+}
+
+.nasa-boundary-editor .boundary-map {
+  height:clamp(420px,56svh,620px);
+  min-height:420px;
+  max-height:620px;
+}
+
+.nasa-layer-toolbar.compact {
+  gap:14px;
+  padding:11px 14px;
+}
+
+.nasa-layer-toolbar.compact .layer-pills {
+  flex:1 1 auto;
+}
+
+.nasa-layer-toolbar.compact .imagery-date {
+  flex:0 0 auto;
+}
+
+.nasa-map-toolbar {
+  padding:13px 14px !important;
+}
+
+.map-toolbar.nasa-map-toolbar > div:first-child {
+  gap:4px;
+}
+
+@media(max-width:900px) {
+  .nasa-live-map {
+    width:100%;
+  }
+
+  .map-search-row {
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .map-search-row > small {
+    max-width:none;
+  }
+}
+
+@media(max-width:760px) {
+  .nasa-live-map .map-canvas {
+    min-height:390px;
+    max-height:540px;
+  }
+
+  .nasa-boundary-editor .boundary-map {
+    height:52svh;
+    min-height:380px;
+    max-height:540px;
+  }
+
+  .nasa-layer-toolbar.compact {
+    padding:10px;
+  }
+}
+
+@media(max-width:460px) {
+  .map-search-row {
+    padding:10px;
+  }
+
+  .field-search-row {
+    padding:8px 0;
+  }
+
+  .nasa-live-map .map-canvas {
+    min-height:360px;
+    max-height:480px;
+  }
+
+  .nasa-boundary-editor .boundary-map {
+    height:48svh;
+    min-height:350px;
+    max-height:480px;
+  }
+
+  .map-quality-badge {
+    display:none;
+  }
+}

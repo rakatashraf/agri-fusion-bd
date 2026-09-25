@@ -36,7 +36,7 @@
     {/if}
   </section>
 
-  <LiveGpsMap fields={visibleFields} height="min(72vh, 760px)" />
+  <LiveGpsMap fields={visibleFields} height="clamp(420px, 56svh, 620px)" />
 
   <section class="content-section">
     <div class="section-heading">
