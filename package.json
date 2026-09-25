@@ -19,9 +19,11 @@
     "svelte": "^5.0.0-next.1",
     "svelte-check": "^4.0.0",
     "typescript": "^5.0.0",
-    "vite": "^5.0.3"
+    "vite": "^5.0.3",
+    "vite-plugin-static-copy": "^3.1.5"
   },
   "dependencies": {
-    "leaflet": "^1.9.4"
+    "leaflet": "^1.9.4",
+    "piper-tts-web": "^1.1.2"
   }
 }
