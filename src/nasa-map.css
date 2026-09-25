@@ -1,0 +1,434 @@
+/* NASA GIBS satellite map + interactive polygon selection */
+.nasa-boundary-editor,
+.nasa-live-map {
+  --nasa-ink:#0d2618;
+  --nasa-lime:#d9ff54;
+  --nasa-green:#3ee577;
+  --nasa-blue:#267dff;
+  --nasa-amber:#ffce56;
+}
+
+.nasa-map-head {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:12px;
+  align-items:center;
+  padding:14px 15px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#e4efdc,#f4f0dd);
+  border:1px solid rgba(13,38,24,.1);
+}
+
+.nasa-map-head > div:last-child {
+  display:grid;
+  gap:3px;
+}
+
+.nasa-map-head span:not(.pulse-dot) {
+  color:#667269;
+  font-size:.82rem;
+  line-height:1.4;
+}
+
+.nasa-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  width:max-content;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#102f1d;
+  color:#fff;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.06em;
+}
+
+.pulse-dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#79ff93;
+  box-shadow:0 0 0 0 rgba(121,255,147,.5);
+  animation:nasaPulse 1.8s infinite;
+}
+
+@keyframes nasaPulse {
+  70% { box-shadow:0 0 0 8px rgba(121,255,147,0); }
+  100% { box-shadow:0 0 0 0 rgba(121,255,147,0); }
+}
+
+.nasa-layer-toolbar {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.layer-pills {
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.layer-pills button {
+  min-height:50px;
+  border:1px solid rgba(13,38,24,.13);
+  background:#fffdf8;
+  border-radius:15px;
+  padding:8px 13px;
+  display:grid;
+  gap:1px;
+  text-align:left;
+  color:#1d3425;
+}
+
+.layer-pills button b { font-size:.76rem; }
+.layer-pills button small { font-size:.62rem; color:#6c786e; }
+
+.layer-pills button.active {
+  background:#163b25;
+  color:white;
+  border-color:#163b25;
+  box-shadow:0 7px 20px rgba(22,59,37,.14);
+}
+
+.layer-pills button.active small { color:#cce0d0; }
+
+.imagery-date {
+  display:flex;
+  gap:6px;
+  align-items:end;
+  flex-wrap:wrap;
+}
+
+.imagery-date label {
+  display:grid;
+  gap:3px;
+  font-size:.65rem;
+  color:#6b766e;
+}
+
+.imagery-date input,
+.imagery-date button {
+  min-height:42px;
+  border:1px solid rgba(13,38,24,.13);
+  background:#fffdf8;
+  border-radius:12px;
+  padding:8px 10px;
+  color:#183021;
+  font:inherit;
+  font-weight:800;
+}
+
+.imagery-date button.active {
+  background:#d9ff54;
+}
+
+.imagery-meta {
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.imagery-meta > span {
+  padding:6px 9px;
+  border-radius:999px;
+  background:#edf1e8;
+  color:#536158;
+  font-size:.67rem;
+  white-space:nowrap;
+}
+
+.imagery-meta .loading-chip {
+  background:#dcebf3;
+  color:#245d7b;
+}
+
+.imagery-meta .warning-chip {
+  background:#fae6d5;
+  color:#914d1f;
+}
+
+.boundary-map-wrap,
+.map-canvas-wrap {
+  position:relative;
+  overflow:hidden;
+  border-radius:24px;
+  background:#17271c;
+  border:1px solid rgba(13,38,24,.12);
+  box-shadow:0 18px 50px rgba(18,45,29,.12);
+}
+
+.nasa-boundary-editor .boundary-map {
+  height:clamp(400px,62vh,700px);
+  min-height:400px;
+  border:0;
+  border-radius:0;
+  cursor:crosshair;
+}
+
+.nasa-live-map .map-canvas {
+  border-radius:0 !important;
+}
+
+.leaflet-container {
+  background:#15251a !important;
+  font-family:inherit !important;
+}
+
+.leaflet-tile {
+  image-rendering:auto;
+}
+
+.leaflet-control-zoom a {
+  width:38px !important;
+  height:38px !important;
+  line-height:38px !important;
+  color:#173521 !important;
+}
+
+.field-vertex-shell {
+  background:transparent !important;
+  border:0 !important;
+}
+
+.field-vertex {
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#d9ff54;
+  color:#102d1c;
+  border:3px solid #fff;
+  box-shadow:0 4px 14px rgba(0,0,0,.38);
+  font-size:.69rem;
+  font-weight:950;
+  cursor:grab;
+}
+
+.field-vertex:active {
+  cursor:grabbing;
+  background:#fff;
+  transform:scale(1.12);
+}
+
+.farmer-selection-polygon {
+  filter:drop-shadow(0 0 4px rgba(217,255,84,.5));
+}
+
+.draw-state,
+.map-quality-badge {
+  position:absolute;
+  z-index:650;
+  pointer-events:none;
+  backdrop-filter:blur(12px);
+}
+
+.draw-state {
+  top:13px;
+  left:13px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 11px;
+  border-radius:999px;
+  background:rgba(255,206,86,.9);
+  color:#4d3700;
+  font-size:.7rem;
+  font-weight:900;
+  box-shadow:0 7px 20px rgba(0,0,0,.14);
+}
+
+.draw-state.ready {
+  background:rgba(217,255,84,.92);
+  color:#17301e;
+}
+
+.draw-dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:currentColor;
+}
+
+.map-quality-badge {
+  right:13px;
+  bottom:13px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(9,28,17,.78);
+  color:#dff4e3;
+  font-size:.62rem;
+  font-weight:900;
+}
+
+.boundary-tools-strong {
+  grid-template-columns:1.25fr 1.2fr 1fr .7fr !important;
+}
+
+.boundary-tool.finish {
+  background:#d9ff54;
+  color:#17301e;
+  border-color:#bddd3d;
+}
+
+.boundary-result-color {
+  grid-template-columns:repeat(4,1fr) !important;
+}
+
+.boundary-result-color > div {
+  background:#f1eee5 !important;
+}
+
+.boundary-result-color.ready > div {
+  background:#e6f0df !important;
+}
+
+.nasa-map-note {
+  margin:0;
+  padding:10px 12px;
+  border-left:3px solid #92b268;
+  color:#68736b;
+  font-size:.72rem;
+  line-height:1.5;
+}
+
+.nasa-map-toolbar {
+  align-items:center !important;
+}
+
+.nasa-map-toolbar > div:first-child {
+  display:grid;
+  gap:3px;
+}
+
+.live-map-actions {
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.nasa-layer-toolbar.compact {
+  padding:10px 14px;
+  background:#f6f3e9;
+  border-top:1px solid rgba(13,38,24,.08);
+  border-bottom:1px solid rgba(13,38,24,.08);
+}
+
+.nasa-layer-toolbar.compact .layer-pills button {
+  min-height:44px;
+}
+
+.selected-field-strip {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:12px 14px;
+  background:#173522;
+  color:white;
+}
+
+.selected-field-strip small {
+  display:block;
+  margin-top:2px;
+  color:#bfd2c3;
+}
+
+.risk-swatch {
+  width:13px;
+  height:42px;
+  border-radius:999px;
+}
+
+.satellite-popup strong {
+  font-size:.86rem;
+}
+
+@media(max-width:760px) {
+  .nasa-layer-toolbar {
+    align-items:stretch;
+  }
+
+  .layer-pills {
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .layer-pills button {
+    min-width:0;
+    padding:8px;
+  }
+
+  .imagery-date {
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr auto auto;
+  }
+
+  .imagery-date label {
+    min-width:0;
+  }
+
+  .imagery-date input {
+    width:100%;
+    min-width:0;
+  }
+
+  .boundary-tools-strong {
+    grid-template-columns:1fr 1fr !important;
+  }
+
+  .boundary-result-color {
+    grid-template-columns:1fr 1fr !important;
+  }
+
+  .nasa-boundary-editor .boundary-map {
+    height:min(58svh,560px);
+    min-height:370px;
+  }
+}
+
+@media(max-width:460px) {
+  .nasa-map-head {
+    grid-template-columns:1fr;
+  }
+
+  .layer-pills button b {
+    font-size:.69rem;
+  }
+
+  .layer-pills button small {
+    display:none;
+  }
+
+  .imagery-date {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .imagery-date label {
+    grid-column:1 / -1;
+  }
+
+  .boundary-tools-strong {
+    grid-template-columns:1fr !important;
+  }
+
+  .boundary-result-color {
+    grid-template-columns:1fr !important;
+  }
+
+  .nasa-boundary-editor .boundary-map {
+    height:52svh;
+    min-height:330px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .pulse-dot { animation:none; }
+}

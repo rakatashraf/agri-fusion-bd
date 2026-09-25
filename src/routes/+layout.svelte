@@ -8,6 +8,7 @@
   import '../photo-card-extra.css';
   import '../full-bleed-cards.css';
   import '../logo.css';
+  import '../nasa-map.css';
   import AppHeader from '$lib/components/AppHeader.svelte';
   import LoadingScreen from '$lib/components/LoadingScreen.svelte';
   const { children } = $props();

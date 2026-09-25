@@ -20,7 +20,13 @@
 
 <main class="page">
   <section class="page-title map-title">
-    <div><span class="eyebrow">GPS + field boundaries</span><h1>{tr($language,'map')}</h1><p>{$language === 'bn' ? 'আপনার অবস্থান, জমির আসল polygon সীমানা এবং ঝুঁকি একই মানচিত্রে।' : 'Your position, real field polygons and risk in one map.'}</p></div>
+    <div>
+      <span class="eyebrow">NASA GIBS • GPS • POLYGON FIELDS</span>
+      <h1>{tr($language,'map')}</h1>
+      <p>{$language === 'bn'
+        ? 'NASA Earth Observation স্যাটেলাইট ইমেজারি, আপনার GPS অবস্থান এবং জমির আসল polygon সীমানা একই ইন্টার‍্যাক্টিভ ম্যাপে।'
+        : 'NASA Earth Observation imagery, your live GPS position and real field polygons in one interactive map.'}</p>
+    </div>
     {#if $session?.role === 'specialist'}
       <label class="area-select">{tr($language,'responsibleArea')}
         <select value={$specialistArea} on:change={(e) => setSpecialistArea(e.currentTarget.value)}>
@@ -30,12 +36,16 @@
     {/if}
   </section>
 
-  <LiveGpsMap fields={visibleFields} height="min(68vh, 620px)" />
+  <LiveGpsMap fields={visibleFields} height="min(72vh, 760px)" />
 
   <section class="content-section">
     <div class="section-heading">
-      <div><h2>{tr($language,'allFields')}</h2><p>{visibleFields.length} {$language === 'bn' ? 'টি নিবন্ধিত জমি' : 'registered fields'}</p></div>
+      <div>
+        <h2>{tr($language,'allFields')}</h2>
+        <p>{visibleFields.length} {$language === 'bn' ? 'টি নিবন্ধিত জমি • রঙ দিয়ে ঝুঁকি দেখানো হয়েছে' : 'registered fields • risk is color-coded'}</p>
+      </div>
     </div>
+
     <div class="map-field-list">
       {#each visibleFields as field}
         <article class="map-field-photo-card">
