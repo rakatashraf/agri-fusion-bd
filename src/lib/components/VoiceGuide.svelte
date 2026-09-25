@@ -9,46 +9,27 @@
   let preparing = false;
   let error = '';
   let voices: SpeechSynthesisVoice[] = [];
-  let currentAudio: HTMLAudioElement | null = null;
-  let currentUrl: string | null = null;
-  let piperEngine: any = null;
+  let speechToken = 0;
 
-  class CachedFetchProvider {
-    private objectUrls: string[] = [];
-
-    destroy() {
-      this.objectUrls.forEach((url) => URL.revokeObjectURL(url));
-      this.objectUrls = [];
-    }
-
-    async fetch(url: string) {
-      const isJson = url.endsWith('.json');
-      let response: Response | undefined;
-
-      if ('caches' in window) {
-        const cache = await caches.open('agrifusion-bangla-tts-v1');
-        const cached = await cache.match(url);
-        if (cached) {
-          response = cached;
-        } else {
-          const network = await fetch(url, { mode: 'cors' });
-          if (!network.ok) throw new Error('Could not fetch Bengali voice model');
-          await cache.put(url, network.clone());
-          response = network;
-        }
-      } else {
-        const network = await fetch(url, { mode: 'cors' });
-        if (!network.ok) throw new Error('Could not fetch Bengali voice model');
-        response = network;
-      }
-
-      if (isJson) return response.json();
-
-      const objectUrl = URL.createObjectURL(await response.blob());
-      this.objectUrls.push(objectUrl);
-      return objectUrl;
-    }
-  }
+  const vowelSigns: Record<string,string> = {
+    'া':'a','ি':'i','ী':'ee','ু':'u','ূ':'oo','ৃ':'ri','ে':'e','ৈ':'oi','ো':'o','ৌ':'ou'
+  };
+  const independentVowels: Record<string,string> = {
+    'অ':'o','আ':'a','ই':'i','ঈ':'ee','উ':'u','ঊ':'oo','ঋ':'ri','এ':'e','ঐ':'oi','ও':'o','ঔ':'ou'
+  };
+  const consonants: Record<string,string> = {
+    'ক':'k','খ':'kh','গ':'g','ঘ':'gh','ঙ':'ng',
+    'চ':'ch','ছ':'chh','জ':'j','ঝ':'jh','ঞ':'ny',
+    'ট':'t','ঠ':'th','ড':'d','ঢ':'dh','ণ':'n',
+    'ত':'t','থ':'th','দ':'d','ধ':'dh','ন':'n',
+    'প':'p','ফ':'f','ব':'b','ভ':'bh','ম':'m',
+    'য':'j','র':'r','ল':'l','শ':'sh','ষ':'sh','স':'s','হ':'h',
+    'ড়':'r','ঢ়':'rh','য়':'y','ৎ':'t'
+  };
+  const marks: Record<string,string> = { 'ং':'ng','ঃ':'h','ঁ':'n' };
+  const bengaliDigits: Record<string,string> = {
+    '০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9'
+  };
 
   function refreshVoices() {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -57,88 +38,83 @@
 
   onMount(() => {
     refreshVoices();
-
     if ('speechSynthesis' in window) {
       window.speechSynthesis.addEventListener('voiceschanged', refreshVoices);
     }
 
     return () => {
-      stopAll();
+      stopSpeech();
       if ('speechSynthesis' in window) {
         window.speechSynthesis.removeEventListener('voiceschanged', refreshVoices);
       }
-      piperEngine?.destroy?.();
     };
   });
 
   $: if ($language) {
     error = '';
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-      speaking = false;
-    }
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio = null;
-      speaking = false;
-    }
+    stopSpeech();
   }
 
   function normalize(value = '') {
-    return value.toLowerCase().replace('_', '-');
+    return value.toLowerCase().replace(/_/g, '-');
   }
 
-  function bestVoice(lang: 'bn' | 'en') {
-    const candidates = voices.length ? voices : (
+  function scoreVoice(voice: SpeechSynthesisVoice, lang: 'bn'|'en') {
+    const voiceLang = normalize(voice.lang);
+    const name = normalize(voice.name);
+    let score = 0;
+
+    if (lang === 'bn') {
+      if (voiceLang === 'bn-bd') score += 150;
+      else if (voiceLang === 'bn-in') score += 140;
+      else if (voiceLang.startsWith('bn')) score += 130;
+
+      if (name.includes('bangla')) score += 60;
+      if (name.includes('bengali')) score += 60;
+      if (name.includes('বাংলা')) score += 60;
+      if (name.includes('nabanita')) score += 30;
+      if (name.includes('pradeep')) score += 25;
+      if (name.includes('tanishaa')) score += 25;
+      if (name.includes('bashkar')) score += 25;
+      if (name.includes('google')) score += 8;
+      if (name.includes('microsoft')) score += 6;
+      if (voice.localService) score += 3;
+    } else {
+      if (voiceLang === 'en-us') score += 110;
+      else if (voiceLang === 'en-gb') score += 100;
+      else if (voiceLang.startsWith('en')) score += 90;
+
+      if (name.includes('natural')) score += 12;
+      if (name.includes('google')) score += 8;
+      if (name.includes('microsoft')) score += 6;
+      if (voice.localService) score += 3;
+    }
+
+    return score;
+  }
+
+  function bestVoice(lang: 'bn'|'en') {
+    const list = voices.length ? voices : (
       typeof window !== 'undefined' && 'speechSynthesis' in window
         ? window.speechSynthesis.getVoices()
         : []
     );
 
-    if (!candidates.length) return null;
-
-    const scored = candidates.map((voice) => {
-      const voiceLang = normalize(voice.lang);
-      const name = normalize(voice.name);
-      let score = 0;
-
-      if (lang === 'bn') {
-        if (voiceLang === 'bn-bd') score += 120;
-        else if (voiceLang === 'bn-in') score += 110;
-        else if (voiceLang.startsWith('bn')) score += 100;
-
-        if (name.includes('bangla')) score += 35;
-        if (name.includes('bengali')) score += 35;
-        if (name.includes('বাংলা')) score += 35;
-        if (name.includes('nabanita')) score += 25;
-        if (name.includes('pradeep')) score += 20;
-        if (name.includes('tanishaa')) score += 18;
-        if (name.includes('bashkar')) score += 18;
-        if (voice.localService) score += 3;
-      } else {
-        if (voiceLang === 'en-us') score += 100;
-        else if (voiceLang === 'en-gb') score += 90;
-        else if (voiceLang.startsWith('en')) score += 80;
-        if (name.includes('natural')) score += 10;
-        if (name.includes('google')) score += 6;
-        if (name.includes('microsoft')) score += 5;
-      }
-
-      return { voice, score };
-    }).sort((a, b) => b.score - a.score);
-
-    return scored[0]?.score > 0 ? scored[0].voice : null;
+    return list
+      .map((voice) => ({ voice, score: scoreVoice(voice, lang) }))
+      .sort((a,b) => b.score - a.score)
+      .find((item) => item.score > 0)?.voice ?? null;
   }
 
-  async function waitForVoices(timeout = 1600) {
+  async function waitForVoices(timeout = 1800) {
     refreshVoices();
     if (voices.length) return;
 
     await new Promise<void>((resolve) => {
-      const started = Date.now();
+      const start = Date.now();
       const timer = window.setInterval(() => {
         refreshVoices();
-        if (voices.length || Date.now() - started >= timeout) {
+        if (voices.length || Date.now() - start >= timeout) {
           window.clearInterval(timer);
           resolve();
         }
@@ -146,8 +122,80 @@
     });
   }
 
+  function isConsonant(char = '') {
+    return Boolean(consonants[char]);
+  }
+
+  function transliterateBangla(value: string) {
+    let out = '';
+
+    for (let i = 0; i < value.length; i++) {
+      const char = value[i];
+
+      if (independentVowels[char]) {
+        out += independentVowels[char];
+        continue;
+      }
+
+      if (consonants[char]) {
+        const next = value[i + 1] || '';
+        const next2 = value[i + 2] || '';
+        let part = consonants[char];
+
+        if (next === '্') {
+          out += part;
+          i += 1;
+          continue;
+        }
+
+        if (vowelSigns[next]) {
+          out += part + vowelSigns[next];
+          i += 1;
+          continue;
+        }
+
+        const atWordEnd = !next || /[\s,.;:!?।()\-–—/]/.test(next);
+        const beforeMark = marks[next] || bengaliDigits[next];
+
+        if (atWordEnd || beforeMark) {
+          out += part;
+        } else if (isConsonant(next) || (next === '্' && isConsonant(next2))) {
+          out += part + 'o';
+        } else {
+          out += part + 'o';
+        }
+        continue;
+      }
+
+      if (vowelSigns[char]) {
+        out += vowelSigns[char];
+        continue;
+      }
+
+      if (marks[char]) {
+        out += marks[char];
+        continue;
+      }
+
+      if (bengaliDigits[char]) {
+        out += bengaliDigits[char];
+        continue;
+      }
+
+      if (char === '্') continue;
+      out += char;
+    }
+
+    return out
+      .replace(/oo+/g,'oo')
+      .replace(/aa+/g,'aa')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+
   function splitForSpeech(value: string) {
     const cleaned = value.replace(/\s+/g, ' ').trim();
+    if (!cleaned) return [];
     if (cleaned.length <= 180) return [cleaned];
 
     const sentences = cleaned.split(/(?<=[।.!?])\s+/).filter(Boolean);
@@ -159,18 +207,14 @@
         active = (active + ' ' + sentence).trim();
       } else {
         if (active) chunks.push(active);
-        if (sentence.length <= 180) {
-          active = sentence;
-        } else {
-          const words = sentence.split(' ');
-          active = '';
-          for (const word of words) {
-            if ((active + ' ' + word).trim().length > 180) {
-              if (active) chunks.push(active);
-              active = word;
-            } else {
-              active = (active + ' ' + word).trim();
-            }
+        const words = sentence.split(' ');
+        active = '';
+        for (const word of words) {
+          if ((active + ' ' + word).trim().length > 180) {
+            if (active) chunks.push(active);
+            active = word;
+          } else {
+            active = (active + ' ' + word).trim();
           }
         }
       }
@@ -180,178 +224,107 @@
     return chunks;
   }
 
-  function stopAll() {
+  function stopSpeech() {
+    speechToken += 1;
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
-
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      currentAudio = null;
-    }
-
-    if (currentUrl) {
-      URL.revokeObjectURL(currentUrl);
-      currentUrl = null;
-    }
-
     speaking = false;
     preparing = false;
   }
 
-  async function speakNative(voice: SpeechSynthesisVoice, lang: 'bn' | 'en') {
-    const chunks = splitForSpeech(text);
+  async function speakChunks(
+    chunks: string[],
+    voice: SpeechSynthesisVoice | null,
+    langCode: string,
+    rate: number,
+    token: number
+  ) {
     if (!chunks.length) return;
 
-    window.speechSynthesis.cancel();
     speaking = true;
+    preparing = false;
 
     for (const chunk of chunks) {
+      if (token !== speechToken) return;
+
       await new Promise<void>((resolve, reject) => {
         const utterance = new SpeechSynthesisUtterance(chunk);
-        utterance.voice = voice;
-        utterance.lang = lang === 'bn' ? (voice.lang || 'bn-BD') : (voice.lang || 'en-US');
-        utterance.rate = lang === 'bn' ? 0.86 : 0.92;
+        if (voice) utterance.voice = voice;
+        utterance.lang = voice?.lang || langCode;
+        utterance.rate = rate;
         utterance.pitch = 1;
         utterance.volume = 1;
+
         utterance.onend = () => resolve();
-        utterance.onerror = (event) => reject(new Error(event.error || 'Speech failed'));
+        utterance.onerror = (event) => {
+          if (event.error === 'canceled' || event.error === 'interrupted') resolve();
+          else reject(new Error(event.error || 'Speech failed'));
+        };
+
         window.speechSynthesis.speak(utterance);
+
+        // Chrome can occasionally leave synthesis paused after language/voice changes.
+        window.setTimeout(() => {
+          if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        }, 120);
       });
     }
 
-    speaking = false;
-  }
-
-  async function getPiperEngine() {
-    if (piperEngine) return piperEngine;
-
-    const {
-      PiperWebEngine,
-      OnnxWebRuntime,
-      PhonemizeWebRuntime,
-      HuggingFaceVoiceProvider
-    } = await import('piper-tts-web');
-
-    const base = import.meta.env.BASE_URL || '/';
-    const provider = new CachedFetchProvider();
-
-    piperEngine = new PiperWebEngine({
-      onnxRuntime: new OnnxWebRuntime({
-        basePath: base + 'onnx/',
-        numThreads: 1
-      }),
-      phonemizeRuntime: new PhonemizeWebRuntime({
-        basePath: base + 'piper/'
-      }),
-      voiceProvider: new HuggingFaceVoiceProvider({ provider })
-    });
-
-    return piperEngine;
-  }
-
-  async function speakBanglaFallback() {
-    preparing = true;
-    error = '';
-
-    try {
-      const engine = await getPiperEngine();
-      const response = await engine.generate(text, 'bn_BD-google-medium', 0);
-
-      if (!response?.file) throw new Error('No Bengali audio was generated');
-
-      currentUrl = URL.createObjectURL(response.file);
-      currentAudio = new Audio(currentUrl);
-      currentAudio.preload = 'auto';
-      currentAudio.playbackRate = 1;
-
-      currentAudio.onplay = () => {
-        preparing = false;
-        speaking = true;
-      };
-      currentAudio.onended = () => {
-        speaking = false;
-        currentAudio = null;
-        if (currentUrl) {
-          URL.revokeObjectURL(currentUrl);
-          currentUrl = null;
-        }
-      };
-      currentAudio.onerror = () => {
-        speaking = false;
-        preparing = false;
-        error = 'বাংলা অডিও চালানো যায়নি';
-      };
-
-      await currentAudio.play();
-    } catch (fallbackError) {
-      console.error('Bangla TTS fallback failed', fallbackError);
-      preparing = false;
-      speaking = false;
-      error = 'বাংলা ভয়েস লোড করা যায়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।';
-    }
+    if (token === speechToken) speaking = false;
   }
 
   async function speak() {
     if (!text?.trim() || typeof window === 'undefined') return;
 
     if (speaking || preparing) {
-      stopAll();
+      stopSpeech();
+      return;
+    }
+
+    if (!('speechSynthesis' in window)) {
+      error = $language === 'bn'
+        ? 'এই ব্রাউজারে ভয়েস সুবিধা নেই'
+        : 'Voice is not supported in this browser.';
       return;
     }
 
     error = '';
     preparing = true;
+    const token = ++speechToken;
 
     try {
-      if ('speechSynthesis' in window) {
-        await waitForVoices();
-
-        const lang = $language === 'bn' ? 'bn' : 'en';
-        const voice = bestVoice(lang);
-
-        if (voice) {
-          preparing = false;
-          await speakNative(voice, lang);
-          return;
-        }
-
-        // Some browsers can synthesize a language even when getVoices() does not expose it.
-        if (lang === 'en') {
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'en-US';
-          utterance.rate = .92;
-          utterance.onstart = () => {
-            preparing = false;
-            speaking = true;
-          };
-          utterance.onend = () => speaking = false;
-          utterance.onerror = () => {
-            preparing = false;
-            speaking = false;
-            error = 'Audio is not available on this browser.';
-          };
-          window.speechSynthesis.speak(utterance);
-          return;
-        }
-      }
+      await waitForVoices();
+      if (token !== speechToken) return;
 
       if ($language === 'bn') {
-        await speakBanglaFallback();
+        const banglaVoice = bestVoice('bn');
+
+        if (banglaVoice) {
+          await speakChunks(splitForSpeech(text), banglaVoice, 'bn-BD', .86, token);
+          return;
+        }
+
+        // Last-resort accessibility fallback for devices (notably some Windows installs)
+        // that expose no Bengali TTS voice at all.
+        const englishVoice = bestVoice('en');
+        const phonetic = transliterateBangla(text);
+
+        if (!phonetic) throw new Error('Could not prepare Bangla speech');
+        await speakChunks(splitForSpeech(phonetic), englishVoice, 'en-US', .78, token);
         return;
       }
 
-      preparing = false;
-      error = 'Audio is not available on this browser.';
+      const englishVoice = bestVoice('en');
+      await speakChunks(splitForSpeech(text), englishVoice, 'en-US', .92, token);
     } catch (speechError) {
       console.error('Speech failed', speechError);
-      stopAll();
-
-      if ($language === 'bn') {
-        await speakBanglaFallback();
-      } else {
-        error = 'Audio is not available on this browser.';
+      if (token === speechToken) {
+        speaking = false;
+        preparing = false;
+        error = $language === 'bn'
+          ? 'বাংলা অডিও চালানো যায়নি'
+          : 'Audio could not be played.';
       }
     }
   }
@@ -367,9 +340,6 @@
     on:click={speak}
     aria-pressed={speaking}
     aria-label={$language === 'bn' ? 'এই লেখা শুনুন' : 'Listen to this text'}
-    title={$language === 'bn'
-      ? (preparing ? 'বাংলা ভয়েস প্রস্তুত হচ্ছে' : speaking ? 'বন্ধ করতে চাপুন' : 'বাংলায় শুনুন')
-      : (preparing ? 'Preparing voice' : speaking ? 'Tap to stop' : 'Listen')}
   >
     <span class="voice-icon">{preparing ? '◌' : speaking ? '◖))' : '🔊'}</span>
     {#if !compact}
