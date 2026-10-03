@@ -1,0 +1,19 @@
+name: Temporary AgriFusion transfer
+on:
+  push:
+    paths:
+      - '.github/workflows/_temp_transfer.yml'
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download corrected video
+        run: |
+          curl -fL 'https://d2ol7oe51mr4n9.cloudfront.net/user_3K1pSAPC3GyMBmhFW7LLkI5iQ05/8616a98e-4510-4f11-8277-dafb2988bcd9.mp4' -o AgriFusion_BD_FINAL_TRUE_SIMULTANEOUS_1080p.mp4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AgriFusion-final-video
+          path: AgriFusion_BD_FINAL_TRUE_SIMULTANEOUS_1080p.mp4
+          compression-level: 0
+          retention-days: 1
